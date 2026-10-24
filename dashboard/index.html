@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>銷售數據儀表板｜SalesData 2018–2020</title>
+<style>
+  :root{
+    --bg:#f4f6fa; --panel:#ffffff; --panel-2:#f8fafc; --ink:#0d1526; --ink-2:#3b4759;
+    --muted:#68758a; --line:#e3e8f0; --accent:#1b4fd8; --accent-2:#0f766e;
+    --good:#0f7a4d; --bad:#b3261e; --warn:#a86400;
+    --c1:#1b4fd8; --c2:#0f766e; --c3:#a86400; --c4:#7c3aed; --c5:#be185d; --c6:#0e7490;
+    --soft:#eaefff; --good-soft:#e7f6ee; --bad-soft:#fdeceb; --warn-soft:#fdf5e6;
+    --ring:rgba(27,79,216,.35);
+    --shadow:0 1px 2px rgba(13,21,38,.05), 0 14px 34px -20px rgba(13,21,38,.35);
+    --r:16px; --r-sm:10px;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+    --t:180ms cubic-bezier(.2,.7,.3,1);
+    --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#070b14; --panel:#0f1626; --panel-2:#131c2e; --ink:#eef2f9; --ink-2:#c3cddd;
+      --muted:#8f9cb2; --line:#22304a; --accent:#8fb0ff; --accent-2:#5eead4;
+      --good:#4ade80; --bad:#fca5a5; --warn:#fbbf24;
+      --c1:#8fb0ff; --c2:#5eead4; --c3:#fbbf24; --c4:#c4b5fd; --c5:#f9a8d4; --c6:#67e8f9;
+      --soft:#17224a; --good-soft:#0d2a1e; --bad-soft:#2b1615; --warn-soft:#2a2213;
+      --ring:rgba(143,176,255,.4);
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 18px 40px -22px rgba(0,0,0,.85);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#f4f6fa; --panel:#fff; --panel-2:#f8fafc; --ink:#0d1526; --ink-2:#3b4759;
+    --muted:#68758a; --line:#e3e8f0; --accent:#1b4fd8; --accent-2:#0f766e;
+    --good:#0f7a4d; --bad:#b3261e; --warn:#a86400;
+    --c1:#1b4fd8; --c2:#0f766e; --c3:#a86400; --c4:#7c3aed; --c5:#be185d; --c6:#0e7490;
+    --soft:#eaefff; --good-soft:#e7f6ee; --bad-soft:#fdeceb; --warn-soft:#fdf5e6;
+    --ring:rgba(27,79,216,.35);
+  }
+  :root[data-theme="dark"]{
+    --bg:#070b14; --panel:#0f1626; --panel-2:#131c2e; --ink:#eef2f9; --ink-2:#c3cddd;
+    --muted:#8f9cb2; --line:#22304a; --accent:#8fb0ff; --accent-2:#5eead4;
+    --good:#4ade80; --bad:#fca5a5; --warn:#fbbf24;
+    --c1:#8fb0ff; --c2:#5eead4; --c3:#fbbf24; --c4:#c4b5fd; --c5:#f9a8d4; --c6:#67e8f9;
+    --soft:#17224a; --good-soft:#0d2a1e; --bad-soft:#2b1615; --warn-soft:#2a2213;
+    --ring:rgba(143,176,255,.4);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1360px;margin:0 auto;padding:var(--s5) var(--s4) var(--s7)}
+  h1,h2,h3{margin:0;line-height:1.3;letter-spacing:-.01em}
+  h1{font-size:clamp(21px,2.5vw,31px)}
+  h2{font-size:clamp(16px,1.7vw,20px)}
+  h3{font-size:clamp(14px,1.4vw,16px)}
+  p{margin:0 0 var(--s3);color:var(--ink-2)}
+  a{color:var(--accent)}
+  .muted{color:var(--muted)}
+  .small{font-size:clamp(11.5px,1.05vw,13px)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+           clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+  /* ---------- 頁首 ---------- */
+  .topbar{display:flex;align-items:flex-start;gap:var(--s4);flex-wrap:wrap;margin-bottom:var(--s5)}
+  .topbar__meta{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s3)}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);
+        border-radius:999px;padding:5px 13px;font-size:clamp(11.5px,1.05vw,13px);color:var(--ink-2)}
+  .chip b{color:var(--ink);font-weight:700}
+  .grow{flex:1 1 auto}
+  .toolbar{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center}
+  .btn{appearance:none;cursor:pointer;font:inherit;font-size:clamp(12px,1.1vw,13.5px);font-weight:600;
+       background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);
+       padding:9px 14px;transition:background var(--t),border-color var(--t),transform var(--t),color var(--t)}
+  .btn:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.97)}
+  .btn--primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn--primary:hover{filter:brightness(1.08);color:#fff}
+
+  /* ---------- 區塊 ---------- */
+  section{margin-bottom:var(--s6)}
+  .sec-head{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s4)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+        padding:var(--s5)}
+  .grid{display:grid;gap:var(--s4)}
+  .g-kpi{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+  .g-2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+  .g-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+
+  /* ---------- KPI ---------- */
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4) var(--s5);
+       box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+  .kpi--good::before{background:var(--good)}
+  .kpi--warn::before{background:var(--warn)}
+  .kpi__label{font-size:clamp(11.5px,1.05vw,13px);color:var(--muted);font-weight:700;letter-spacing:.03em}
+  .kpi__value{font-size:clamp(22px,2.6vw,32px);font-weight:800;letter-spacing:-.02em;
+              font-variant-numeric:tabular-nums;margin:2px 0 0}
+  .kpi__sub{font-size:clamp(11.5px,1.05vw,13px);color:var(--muted);margin-top:2px}
+  .kpi__sub .up{color:var(--good);font-weight:700}
+  .kpi__sub .down{color:var(--bad);font-weight:700}
+
+  /* ---------- 篩選 ---------- */
+  .filters{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4) var(--s5);
+           box-shadow:var(--shadow);display:flex;flex-direction:column;gap:var(--s4)}
+  .frow{display:flex;gap:var(--s4);flex-wrap:wrap;align-items:flex-start}
+  .fgroup{display:flex;flex-direction:column;gap:var(--s2);min-width:0}
+  .fgroup__label{font-size:clamp(11.5px,1.05vw,13px);font-weight:700;color:var(--muted);letter-spacing:.03em}
+  .opts{display:flex;gap:var(--s2);flex-wrap:wrap}
+  .opt{position:relative}
+  .opt input{position:absolute;opacity:0;width:0;height:0}
+  .opt span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
+            border-radius:999px;padding:6px 14px;cursor:pointer;font-size:clamp(12px,1.1vw,13.5px);
+            transition:background var(--t),border-color var(--t),color var(--t)}
+  .opt span:hover{border-color:var(--accent)}
+  .opt input:checked + span{background:var(--accent);border-color:var(--accent);color:#fff}
+  .opt input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
+  .opt small{opacity:.75;font-size:.9em}
+  input[type="search"],input[type="text"]{
+    font:inherit;font-size:clamp(12.5px,1.15vw,14px);padding:9px 13px;border-radius:var(--r-sm);
+    border:1px solid var(--line);background:var(--panel-2);color:var(--ink);min-width:220px}
+  input[type="search"]:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring);outline:none}
+  .status{font-size:clamp(12px,1.1vw,13.5px);color:var(--muted)}
+  .status b{color:var(--ink)}
+
+  /* ---------- 圖表 ---------- */
+  .chart{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+         padding:var(--s5);display:flex;flex-direction:column;gap:var(--s3);min-width:0}
+  .chart__head{display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap}
+  .chart__note{font-size:clamp(11.5px,1.05vw,13px);color:var(--muted);margin:0}
+  .chart__svg{width:100%;height:auto;display:block;overflow:visible}
+  .chart__svg text{font-family:var(--font)}
+  .axis{stroke:var(--line);stroke-width:1}
+  .axis-label{fill:var(--muted);font-size:11.5px}
+  .bar{transition:opacity var(--t)}
+  .bar:hover{opacity:.82}
+  .val-label{fill:var(--ink);font-size:12px;font-weight:700}
+  .cat-label{fill:var(--ink-2);font-size:12.5px}
+  details.data-table{margin-top:var(--s2)}
+  details.data-table summary{cursor:pointer;font-size:clamp(11.5px,1.05vw,13px);color:var(--accent);font-weight:600}
+  .tip{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;
+       padding:7px 11px;font-size:12.5px;line-height:1.5;opacity:0;transition:opacity var(--t);
+       max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+  .tip.is-on{opacity:1}
+
+  /* ---------- 表格 ---------- */
+  .tablewrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:var(--r-sm)}
+  table{width:100%;border-collapse:collapse;font-size:clamp(12px,1.1vw,13.5px)}
+  thead th{position:sticky;top:0;background:var(--panel-2);z-index:2;text-align:left;
+           padding:var(--s3) var(--s3);border-bottom:1px solid var(--line);white-space:nowrap;
+           font-size:clamp(11.5px,1.05vw,13px);color:var(--muted);font-weight:700}
+  thead th button{appearance:none;background:none;border:0;cursor:pointer;font:inherit;color:inherit;
+                  font-weight:700;padding:0;display:inline-flex;align-items:center;gap:5px}
+  thead th button:hover{color:var(--accent)}
+  tbody td{padding:var(--s3);border-bottom:1px solid var(--line);color:var(--ink-2);
+           font-variant-numeric:tabular-nums}
+  tbody tr:hover{background:var(--panel-2)}
+  tbody tr:last-child td{border-bottom:none}
+  .num{text-align:right}
+  .tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:clamp(11px,1vw,12.5px);
+       font-weight:700;background:var(--soft);color:var(--accent)}
+  .tag--ok{background:var(--good-soft);color:var(--good)}
+  .tag--bad{background:var(--bad-soft);color:var(--bad)}
+  .tag--warn{background:var(--warn-soft);color:var(--warn)}
+
+  /* ---------- 洞察 ---------- */
+  .list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--s3)}
+  .list li{position:relative;padding-left:var(--s5);color:var(--ink-2);font-size:clamp(12.5px,1.15vw,14.5px)}
+  .list li::before{content:"";position:absolute;left:6px;top:.6em;width:7px;height:7px;border-radius:50%;
+                   background:var(--accent)}
+  .list li.is-warn::before{background:var(--warn)}
+  .list li.is-bad::before{background:var(--bad)}
+  .list li.is-good::before{background:var(--good)}
+  .callout{border-radius:var(--r-sm);padding:var(--s3) var(--s4);font-size:clamp(12px,1.1vw,13.5px);
+           background:var(--warn-soft);color:var(--ink-2)}
+  .callout b{color:var(--ink)}
+  .callout--info{background:var(--soft)}
+
+  footer.foot{border-top:1px solid var(--line);padding-top:var(--s4);color:var(--muted);
+              font-size:clamp(11.5px,1.05vw,13px)}
+
+  /* ---------- 列印 ---------- */
+  @page{size:A4;margin:12mm}
+  @media print{
+    :root{--bg:#fff;--panel:#fff;--panel-2:#fff;--ink:#000;--ink-2:#222;--muted:#555;--line:#bbb;
+          --shadow:none}
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .toolbar,.filters,.chart__svg .bar:hover{display:none}
+    .card,.chart,.kpi{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+    .tablewrap{max-height:none;overflow:visible}
+    thead th{position:static}
+    details.data-table{display:block}
+    details.data-table[open] summary{display:none}
+    .tip{display:none}
+    a{color:#000;text-decoration:none}
+    h1{font-size:18pt} h2{font-size:13pt}
+    tbody td,thead th{font-size:8.5pt;padding:4px 5px}
+    section{margin-bottom:8mm}
+    .kpi__value{font-size:14pt}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 頁首 ===== -->
+  <header class="topbar">
+    <div class="grow">
+      <h1>銷售數據儀表板</h1>
+      <p style="margin-top:8px">
+        目的：以來源工作簿 <b>Dashboard_Data.xlsx</b> 的 <b>SalesData</b> 工作表，呈現 2018–2020 年
+        共 99 筆銷售訂單的收入、成本、毛利，以及地區與產品分佈。
+      </p>
+      <div class="topbar__meta">
+        <span class="chip">來源檔案：<b>Dashboard_Data.xlsx</b></span>
+        <span class="chip">工作表：<b>SalesData</b>（99 筆）</span>
+        <span class="chip">報告期：<b>2018-01-11 至 2020-12-27</b></span>
+        <span class="chip">資料筆數：<b>99</b> 筆訂單</span>
+        <span class="chip">單位：<b>來源未註明幣別</b></span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="themeBtn" type="button" aria-label="切換深色或淺色模式">◐ 主題</button>
+      <button class="btn" id="printBtn" type="button" aria-label="列印或匯出 PDF">⎙ 列印／PDF</button>
+    </div>
+  </header>
+
+  <div class="callout callout--info" style="margin-bottom:var(--s6)">
+    <b>計算方式（依原檔公式）：</b>收入 = <code>UnitPrice × Qty</code>（原檔 <code>SA1</code> 欄公式
+    <code>=SalesData!$G2*SalesData!$I2</code>）；成本 = <code>UnitCost × Qty</code>；
+    毛利 = 收入 − 成本。<code>Date2</code> 欄公式為 <code>=Table1[[#This Row],[Date1]]</code>（與 Date1 相同）、
+    <code>SA2</code> 欄公式為 <code>=Table1[[#This Row],[SA1]]</code>，故未重複計入。
+    來源未載明幣別與單位，所有金額均按原始數值呈現。
+  </div>
+
+  <!-- ===== 篩選 ===== -->
+  <section aria-labelledby="filters-h">
+    <div class="sec-head"><h2 id="filters-h">篩選條件</h2>
+      <span class="status">調整後，下列 KPI、圖表與明細表會同步更新</span></div>
+    <div class="filters">
+      <div class="frow">
+        <div class="fgroup">
+          <span class="fgroup__label" id="lbl-dest">目的地（DEST）</span>
+          <div class="opts" id="f-dest" role="group" aria-labelledby="lbl-dest"></div>
+        </div>
+        <div class="fgroup">
+          <span class="fgroup__label" id="lbl-prod">產品（Product）</span>
+          <div class="opts" id="f-prod" role="group" aria-labelledby="lbl-prod"></div>
+        </div>
+        <div class="fgroup">
+          <span class="fgroup__label" id="lbl-year">年份（依 Date1）</span>
+          <div class="opts" id="f-year" role="group" aria-labelledby="lbl-year"></div>
+        </div>
+      </div>
+      <div class="frow" style="align-items:flex-end">
+        <div class="fgroup grow">
+          <label class="fgroup__label" for="q">搜尋明細（訂單編號／產品／客戶／目的地）</label>
+          <input type="search" id="q" placeholder="例如 INV012、PTS-14、AU" autocomplete="off">
+        </div>
+        <button class="btn" id="resetBtn" type="button">重設全部篩選</button>
+      </div>
+      <p class="status" id="filterStatus" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ===== KPI ===== -->
+  <section aria-labelledby="kpi-h">
+    <div class="sec-head"><h2 id="kpi-h">主要指標</h2>
+      <span class="status">依目前篩選條件計算</span></div>
+    <div class="grid g-kpi" id="kpis"></div>
+  </section>
+
+  <!-- ===== 圖表 ===== -->
+  <section aria-labelledby="charts-h">
+    <div class="sec-head"><h2 id="charts-h">趨勢與比較</h2>
+      <span class="status">將滑鼠移到圖形上可看詳細數值</span></div>
+    <div class="grid g-2">
+      <div class="chart" id="chart-year"></div>
+      <div class="chart" id="chart-dest"></div>
+      <div class="chart" id="chart-prod"></div>
+      <div class="chart" id="chart-margin"></div>
+    </div>
+  </section>
+
+  <!-- ===== 洞察 ===== -->
+  <section aria-labelledby="insight-h">
+    <div class="sec-head"><h2 id="insight-h">風險、異常與洞察</h2>
+      <span class="status">全部依 SalesData 原始數據計算</span></div>
+    <div class="grid g-2">
+      <div class="card">
+        <h3 style="margin-bottom:var(--s3)">趨勢</h3>
+        <ul class="list">
+          <li class="is-bad">收入連續兩年下降：2018 年 4,010,000 → 2019 年 3,420,000（<b>−14.71%</b>）→ 2020 年 2,460,000（<b>−28.07%</b>）。</li>
+          <li class="is-bad">訂單數同步減少：39（2018）→ 36（2019）→ 24（2020）；數量由 284 → 238 → 183。</li>
+          <li>2020 年僅 24 筆訂單，佔全期收入 24.9%，為三年最低。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:var(--s3)">集中度</h3>
+        <ul class="list">
+          <li class="is-warn">目的地集中：<b>AU 50.2%</b> 與 <b>US 29.7%</b> 合計 <b>79.9%</b> 收入；UK、JP、HK 分別為 8.6%、5.8%、5.6%。</li>
+          <li class="is-warn">產品集中：PTS-14（28.8%）與 PTS-13（26.4%）合計 <b>55.2%</b> 收入。</li>
+          <li>PTS-12 收入佔比最低（6.7%），PTS-11 為 9.3%。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:var(--s3)">異常與資料品質</h3>
+        <ul class="list">
+          <li class="is-warn"><b>PTS-11 單價異常</b>：一筆訂單單價 17,000／成本 14,000，同產品其餘 5 筆為單價 4,000–8,000／成本 4,000。</li>
+          <li class="is-warn"><b>零毛利紀錄</b>：PTS-12 有一筆單價＝成本（6,000／6,000）；PTS-13 有一筆 13,000／13,000。</li>
+          <li>全期 99 筆訂單的毛利均為正數，沒有負毛利訂單；整體毛利率 <b>32.79%</b>，各地區介乎 25.7%（UK）至 34.0%（AU）。</li>
+          <li class="is-warn">客戶欄位（CUS）99 筆全不重複，即每張訂單對應一個不同客戶名稱，<b>無法作客戶回購或客戶集中度分析</b>。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:var(--s3)">建議行動（依上述數據）</h3>
+        <ul class="list">
+          <li class="is-good">針對連續兩年收入下滑，優先檢視 2020 年訂單量減少的原因（本檔未載原因，需另行補充）。</li>
+          <li class="is-good">檢視 PTS-11 該筆異常單價是否為輸入錯誤；同類異常會影響產品平均單價與毛利分析。</li>
+          <li class="is-good">AU 與 US 合計近八成收入，建議評估其他地區（UK／JP／HK）的拓展空間以降低集中風險。</li>
+          <li class="is-good">UK 毛利率最低（25.7%），可檢視定價或成本結構。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:var(--s4)">
+      <b>資料限制（來源未提供）：</b>本檔未提供幣別／單位、未提供地區或產品的成本明細以外的分類欄位（如 Category、OrderID）、
+      亦未載明報告目的與業務背景。另有一個隱藏工作表（樞紐分析練習答案），依指示未納入本儀表板；
+      該表提及的 <code>OrdersTable</code>／<code>SampleData</code> 與 Category、OrderID 欄位並不存在於本檔案，
+      因此未作相關分析。凡來源未提供的指標，本儀表板一律不作推估。
+    </div>
+  </section>
+
+  <!-- ===== 明細表 ===== -->
+  <section aria-labelledby="table-h">
+    <div class="sec-head"><h2 id="table-h">訂單明細</h2>
+      <span class="status" id="tableStatus"></span></div>
+    <div class="tablewrap">
+      <table id="tbl">
+        <caption class="sr-only">SalesData 訂單明細，可依欄位排序及搜尋</caption>
+        <thead>
+          <tr>
+            <th scope="col"><button type="button" data-sort="inv">訂單編號 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col"><button type="button" data-sort="date">日期（Date1） <span aria-hidden="true">↕</span></button></th>
+            <th scope="col"><button type="button" data-sort="product">產品 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col"><button type="button" data-sort="customer">客戶 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col"><button type="button" data-sort="dest">目的地 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col" class="num"><button type="button" data-sort="unit_price">單價 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col" class="num"><button type="button" data-sort="unit_cost">單位成本 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col" class="num"><button type="button" data-sort="qty">數量 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col" class="num"><button type="button" data-sort="revenue">收入 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col" class="num"><button type="button" data-sort="cost">成本 <span aria-hidden="true">↕</span></button></th>
+            <th scope="col" class="num"><button type="button" data-sort="margin">毛利率 <span aria-hidden="true">↕</span></button></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:var(--s3)">
+      收入＝單價 × 數量；成本＝單位成本 × 數量；毛利率＝（收入 − 成本）÷ 收入。金額單位依來源，未註明幣別。
+    </p>
+  </section>
+
+  <footer class="foot">
+    資料來源：Dashboard_Data.xlsx｜工作表 SalesData（99 筆，2018-01-11 至 2020-12-27）。
+    本儀表板僅使用該檔案的資料，未加入任何外部數據；來源未提供者均標示為未提供，不作推估。
+  </footer>
+</div>
+
+<div class="tip" id="tip" role="tooltip" aria-hidden="true"></div>
+<p class="sr-only" id="live" role="status" aria-live="polite"></p>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===== 來源資料（SalesData，99 筆；欄位順序：INV#, Date1, Product, CUS, DEST, UnitPrice, UnitCost, Qty） ===== */
+  var RAW = [["INV001","2019-06-27","PTS-11","Chris Ward","AU",17000,14000,8],["INV002","2018-06-25","PTS-14","Kathryn Diaz","US",28000,18000,7],["INV003","2020-07-28","PTS-14","Anna Cooper","UK",25000,18000,12],["INV004","2020-04-30","PTS-14","Russell Lopez","US",32000,18000,9],["INV005","2020-08-05","PTS-15","Mary Thompson","HK",9000,7000,5],["INV006","2018-09-16","PTS-13","Joyce Smith","AU",23000,13000,6],["INV007","2018-06-01","PTS-14","Janice Martin","AU",20000,18000,10],["INV008","2020-11-25","PTS-11","Paul Harris","HK",7000,4000,8],["INV009","2020-11-05","PTS-10","Irene Hughes","US",23000,14000,7],["INV010","2019-09-27","PTS-13","Stephanie Ed","AU",22000,13000,8],["INV011","2020-02-04","PTS-12","Evelyn Jenkins","AU",4000,3000,8],["INV012","2018-08-17","PTS-14","Teresa Clark","UK",22000,18000,5],["INV013","2019-01-27","PTS-11","Jessica Johnson","US",4000,4000,5],["INV014","2018-08-16","PTS-12","Patricia Scott","US",6000,3000,5],["INV015","2018-04-17","PTS-12","Lois Brooks","JP",5000,3000,8],["INV016","2020-09-03","PTS-11","Keith Campbell","US",7000,4000,5],["INV017","2019-05-10","PTS-12","Philip Wright","UK",4000,3000,7],["INV018","2018-01-13","PTS-10","Brandon Lee","AU",18000,14000,7],["INV019","2019-10-24","PTS-15","Jose Miller","AU",11000,7000,9],["INV020","2019-12-04","PTS-13","Gregory Simmons","AU",23000,13000,6],["INV021","2018-05-10","PTS-10","Stephen Stewart","US",22000,14000,9],["INV022","2020-06-03","PTS-13","Thomas Davis","JP",25000,13000,6],["INV023","2019-12-16","PTS-13","Karen Peterson","UK",21000,13000,5],["INV024","2020-07-16","PTS-14","Juan Torres","US",19000,18000,5],["INV025","2019-06-25","PTS-15","Denise King","US",11000,7000,6],["INV026","2018-01-27","PTS-12","Carolyn Gonzales","UK",5000,3000,6],["INV027","2019-01-20","PTS-12","Melissa Rogers","US",5000,3000,5],["INV028","2019-07-26","PTS-12","Harry Carter","AU",5000,3000,7],["INV029","2019-08-16","PTS-15","Ronald Phillips","JP",9000,7000,6],["INV030","2020-04-17","PTS-12","Gloria Murphy","US",5000,3000,7],["INV031","2018-10-12","PTS-15","Matthew Watson","AU",9000,7000,7],["INV032","2020-10-17","PTS-12","Ashley Hernandez","AU",6000,3000,8],["INV033","2018-11-30","PTS-13","Timothy Powell","UK",16000,13000,6],["INV034","2019-06-26","PTS-15","Roger Wilson","AU",9000,7000,10],["INV035","2019-07-09","PTS-10","Jeremy Morgan","US",16000,14000,5],["INV036","2020-01-26","PTS-13","Benjamin Gray","US",23000,13000,10],["INV037","2020-05-30","PTS-12","Louise Walker","US",3000,3000,7],["INV038","2019-10-27","PTS-14","Lawrence Wash","AU",21000,18000,7],["INV039","2018-10-25","PTS-10","Jennifer Moore","AU",21000,14000,5],["INV040","2019-10-17","PTS-11","Eric Ramirez","US",8000,4000,6],["INV041","2018-10-28","PTS-15","Margaret Wood","HK",8000,7000,6],["INV042","2018-02-02","PTS-11","Diana Nelson","JP",4000,4000,9],["INV043","2018-12-16","PTS-11","Roy Butler","UK",5000,4000,6],["INV044","2018-07-30","PTS-13","Ernest Lewis","AU",18000,13000,6],["INV045","2019-02-12","PTS-15","Michael Sanchez","AU",11000,7000,5],["INV046","2019-06-23","PTS-12","Catherine Collin","UK",6000,6000,6],["INV047","2019-07-05","PTS-14","Phillip Reed","AU",35000,18000,5],["INV048","2020-03-23","PTS-13","Betty Sanders","US",13000,13000,9],["INV049","2018-11-09","PTS-14","Barbara Alexande","AU",33000,18000,10],["INV050","2019-11-03","PTS-11","Annie Bailey","AU",8000,4000,6],["INV051","2018-05-21","PTS-11","Doris Jones","HK",5000,4000,10],["INV052","2020-12-27","PTS-11","Donald Anderson","HK",4000,4000,8],["INV053","2019-03-15","PTS-15","Brian Flores","JP",10000,7000,6],["INV054","2019-12-17","PTS-10","Linda Foster","AU",20000,14000,5],["INV055","2020-03-14","PTS-11","Clarence Willia","US",7000,4000,10],["INV056","2020-10-30","PTS-12","Jason Kelly","US",3000,3000,5],["INV057","2020-08-24","PTS-11","Deborah Hall","US",5000,4000,5],["INV058","2018-06-03","PTS-15","Wayne Howard","AU",13000,7000,9],["INV059","2018-02-28","PTS-12","Scott Adams","UK",3000,3000,10],["INV060","2018-12-29","PTS-15","Bruce Hill","US",11000,7000,7],["INV061","2018-06-10","PTS-11","Joe Robinson","US",6000,4000,8],["INV062","2018-10-13","PTS-11","Anne Bryant","JP",6000,4000,8],["INV063","2018-03-03","PTS-13","Peter Russell","AU",16000,13000,6],["INV064","2019-05-13","PTS-10","Fred Jackson","AU",20000,14000,10],["INV065","2018-04-12","PTS-13","Amanda Cox","US",25000,13000,9],["INV066","2019-01-21","PTS-10","Brenda Patterson","AU",15000,14000,5],["INV067","2019-05-30","PTS-15","Shirley Martine","AU",8000,7000,6],["INV068","2018-11-26","PTS-14","Joshua Bell","AU",19000,18000,6],["INV069","2020-05-12","PTS-13","Raymond Baker","US",15000,13000,8],["INV070","2019-11-06","PTS-10","Elizabeth Gonz","AU",23000,14000,5],["INV071","2020-11-25","PTS-12","John Evans","AU",5000,3000,9],["INV072","2018-12-22","PTS-11","Rose Rivera","AU",6000,4000,6],["INV073","2019-09-28","PTS-14","Bobby Allen","US",22000,18000,5],["INV074","2019-03-25","PTS-15","Steve Perry","AU",12000,7000,9],["INV075","2019-12-01","PTS-14","Terry Rodrig","AU",36000,18000,6],["INV076","2018-01-18","PTS-11","Amy Long","AU",5000,4000,7],["INV077","2018-11-19","PTS-11","Sandra Cook","UK",6000,4000,7],["INV078","2018-06-14","PTS-14","Jonathan Green","US",19000,18000,6],["INV079","2018-05-06","PTS-11","William Griffin","US",7000,4000,5],["INV080","2019-09-14","PTS-14","Dorothy Bennett","AU",29000,18000,7],["INV081","2020-08-30","PTS-13","Kevin Turner","JP",18000,13000,5],["INV082","2018-09-02","PTS-12","Walter White","AU",5000,3000,9],["INV083","2019-02-12","PTS-11","Angela Parker","AU",5000,4000,6],["INV084","2020-06-22","PTS-12","Gerald Barnes","HK",5000,3000,9],["INV085","2019-03-10","PTS-12","Todd Thomas","AU",6000,3000,5],["INV086","2018-08-31","PTS-10","Billy Price","AU",27000,14000,10],["INV087","2019-04-01","PTS-14","Eugene Ross","AU",28000,18000,9],["INV088","2019-03-17","PTS-12","Adam Young","AU",4000,3000,9],["INV089","2019-10-11","PTS-12","Marie Henderson","AU",3000,3000,5],["INV090","2019-06-01","PTS-12","Jeffrey Roberts","UK",5000,3000,9],["INV091","2018-01-11","PTS-10","Susan James","HK",15000,14000,5],["INV092","2020-07-20","PTS-13","Justin Richardson","HK",23000,13000,9],["INV093","2018-09-19","PTS-10","Harold Garcia","AU",17000,14000,8],["INV094","2020-01-04","PTS-13","Marilyn Mitchell","AU",22000,13000,9],["INV095","2018-06-19","PTS-10","Christina Perez","US",23000,14000,8],["INV096","2018-10-22","PTS-11","Carol Morris","US",7000,4000,8],["INV097","2019-11-18","PTS-13","Jane Brown","US",24000,13000,9],["INV098","2018-05-05","PTS-10","Christine Taylor","JP",19000,14000,5],["INV099","2018-10-28","PTS-13","Jerry Coleman","AU",22000,13000,9]];
+
+  var COLS = ["inv","date","product","customer","dest","unit_price","unit_cost","qty"];
+  var DATA = RAW.map(function(r){
+    var o = {};
+    COLS.forEach(function(c,i){ o[c] = r[i]; });
+    o.revenue = o.unit_price * o.qty;      // 原檔公式 SA1 = UnitPrice * Qty
+    o.cost    = o.unit_cost  * o.qty;
+    o.margin  = o.revenue ? (o.revenue - o.cost) / o.revenue : 0;
+    o.year    = String(o.date).slice(0,4);
+    return o;
+  });
+
+  var nf0 = new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 0 });
+  var nf1 = new Intl.NumberFormat("zh-TW", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  var nf2 = new Intl.NumberFormat("zh-TW", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var fmt0 = function(v){ return nf0.format(v); };
+  var fmtPct = function(v){ return nf1.format(v * 100) + "%"; };
+
+  var el = function(id){ return document.getElementById(id); };
+  var tip = el("tip"), live = el("live");
+
+  /* ===== 篩選狀態 ===== */
+  var ALL = { dest: uniq("dest"), product: uniq("product"), year: uniq("year") };
+  var state = { dest: [], product: [], year: [], q: "" };
+  var sortState = { key: "date", dir: 1 };
+
+  function uniq(key){
+    var seen = {}, out = [];
+    DATA.forEach(function(d){ if(!seen[d[key]]){ seen[d[key]] = 1; out.push(d[key]); } });
+    return out.sort(function(a,b){ return String(a).localeCompare(String(b), "zh-Hant"); });
+  }
+  function countBy(key, value){
+    return DATA.filter(function(d){ return d[key] === value; }).length;
+  }
+
+  function buildChips(wrapId, key){
+    var wrap = el(wrapId);
+    ALL[key].forEach(function(v){
+      var label = document.createElement("label");
+      label.className = "opt";
+      var cb = document.createElement("input");
+      cb.type = "checkbox"; cb.value = v;
+      cb.setAttribute("data-key", key);
+      cb.addEventListener("change", function(){
+        var list = state[key], i = list.indexOf(v);
+        if (cb.checked && i < 0) list.push(v);
+        if (!cb.checked && i >= 0) list.splice(i, 1);
+        render();
+      });
+      var sp = document.createElement("span");
+      sp.textContent = v + " ";
+      var sm = document.createElement("small");
+      sm.textContent = "(" + countBy(key, v) + ")";
+      sp.appendChild(sm);
+      label.appendChild(cb); label.appendChild(sp);
+      wrap.appendChild(label);
+    });
+  }
+
+  function matches(d){
+    if (state.dest.length    && state.dest.indexOf(d.dest) < 0) return false;
+    if (state.product.length && state.product.indexOf(d.product) < 0) return false;
+    if (state.year.length    && state.year.indexOf(d.year) < 0) return false;
+    if (state.q) {
+      var q = state.q.toLowerCase();
+      var hay = (d.inv + " " + d.date + " " + d.product + " " + d.customer + " " + d.dest).toLowerCase();
+      if (hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  }
+
+  function sum(rows, key){ var t = 0; rows.forEach(function(r){ t += r[key]; }); return t; }
+  function group(rows, key){
+    var m = {}, order = [];
+    rows.forEach(function(r){
+      if (!m[r[key]]) { m[r[key]] = { key: r[key], n: 0, qty: 0, revenue: 0, cost: 0 }; order.push(r[key]); }
+      var g = m[r[key]];
+      g.n++; g.qty += r.qty; g.revenue += r.revenue; g.cost += r.cost;
+    });
+    return order.map(function(k){ return m[k]; });
+  }
+
+  /* ===== KPI ===== */
+  function renderKpis(rows){
+    var revenue = sum(rows, "revenue"), cost = sum(rows, "cost"), qty = sum(rows, "qty");
+    var profit = revenue - cost;
+    var margin = revenue ? profit / revenue : 0;
+    var avgOrder = rows.length ? revenue / rows.length : 0;
+    var byYear = group(rows, "year").sort(function(a,b){ return a.key < b.key ? -1 : 1; });
+    var kpis = [
+      { label:"總收入（UnitPrice × Qty）", value: fmt0(revenue), sub:"依目前篩選", cls:"" },
+      { label:"總成本（UnitCost × Qty）",  value: fmt0(cost),    sub:"依目前篩選", cls:"" },
+      { label:"毛利",                      value: fmt0(profit),  sub:"收入 − 成本", cls: profit >= 0 ? "good" : "warn" },
+      { label:"毛利率",                    value: fmtPct(margin), sub:"毛利 ÷ 收入", cls: margin >= 0.3 ? "good" : "warn" },
+      { label:"訂單數",                    value: fmt0(rows.length), sub:"篩選後筆數", cls:"" },
+      { label:"總數量（Qty）",             value: fmt0(qty),     sub:"篩選後合計", cls:"" },
+      { label:"平均每張訂單收入",           value: fmt0(avgOrder), sub:"收入 ÷ 訂單數", cls:"" }
+    ];
+    if (byYear.length >= 2) {
+      var last = byYear[byYear.length - 1], prev = byYear[byYear.length - 2];
+      var chg = prev.revenue ? (last.revenue - prev.revenue) / prev.revenue : 0;
+      kpis.push({
+        label: "最新年度收入變化（" + prev.key + " → " + last.key + "）",
+        value: (chg >= 0 ? "+" : "") + fmtPct(chg),
+        sub: "依目前篩選之年別合計", cls: chg >= 0 ? "good" : "warn"
+      });
+    }
+    var wrap = el("kpis");
+    wrap.textContent = "";
+    kpis.forEach(function(k){
+      var d = document.createElement("div");
+      d.className = "kpi" + (k.cls ? " kpi--" + k.cls : "");
+      var l = document.createElement("div"); l.className = "kpi__label"; l.textContent = k.label;
+      var v = document.createElement("div"); v.className = "kpi__value"; v.textContent = k.value;
+      var s = document.createElement("div"); s.className = "kpi__sub";   s.textContent = k.sub;
+      d.appendChild(l); d.appendChild(v); d.appendChild(s);
+      wrap.appendChild(d);
+    });
+  }
+
+  /* ===== 圖表工具 ===== */
+  var NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs, text){
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function attachTip(node, html){
+    node.addEventListener("mousemove", function(ev){
+      tip.innerHTML = html;                    // 由本檔自行組裝的固定字串
+      tip.classList.add("is-on");
+      tip.setAttribute("aria-hidden", "false");
+      var pad = 14;
+      var x = ev.clientX + pad, y = ev.clientY + pad;
+      var r = tip.getBoundingClientRect();
+      if (x + r.width > window.innerWidth - 8) x = ev.clientX - r.width - pad;
+      if (y + r.height > window.innerHeight - 8) y = ev.clientY - r.height - pad;
+      tip.style.left = x + "px"; tip.style.top = y + "px";
+    });
+    node.addEventListener("mouseleave", function(){
+      tip.classList.remove("is-on"); tip.setAttribute("aria-hidden", "true");
+    });
+  }
+  function chartCard(host, title, note, ariaLabel, draw, tableSpec){
+    host.textContent = "";
+    var head = document.createElement("div"); head.className = "chart__head";
+    var h = document.createElement("h3"); h.textContent = title;
+    head.appendChild(h);
+    host.appendChild(head);
+    if (note) { var n = document.createElement("p"); n.className = "chart__note"; n.textContent = note; host.appendChild(n); }
+
+    var svg = svgEl("svg", { viewBox: "0 0 620 300", class: "chart__svg", role: "img", "aria-label": ariaLabel });
+    host.appendChild(svg);
+    draw(svg);
+
+    if (tableSpec && tableSpec.rows.length) {
+      var det = document.createElement("details"); det.className = "data-table";
+      var sm = document.createElement("summary"); sm.textContent = "檢視數據表";
+      det.appendChild(sm);
+      var tw = document.createElement("div"); tw.className = "tablewrap"; tw.style.maxHeight = "260px";
+      var t = document.createElement("table");
+      var thead = document.createElement("thead"); var trh = document.createElement("tr");
+      tableSpec.head.forEach(function(txt){
+        var th = document.createElement("th"); th.scope = "col"; th.textContent = txt; trh.appendChild(th);
+      });
+      thead.appendChild(trh); t.appendChild(thead);
+      var tb = document.createElement("tbody");
+      tableSpec.rows.forEach(function(cells){
+        var tr = document.createElement("tr");
+        cells.forEach(function(c){
+          var td = document.createElement("td");
+          td.textContent = c;
+          if (/^[\d,.\-+%]+$/.test(String(c))) td.className = "num";
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); tw.appendChild(t); det.appendChild(tw); host.appendChild(det);
+    }
+  }
+
+  function barChart(svg, data, opts){
+    opts = opts || {};
+    var W = 620, H = 300, padL = opts.padL || 84, padR = 16, padT = 18, padB = 40;
+    var innerW = W - padL - padR, innerH = H - padT - padB;
+    var max = Math.max.apply(null, data.map(function(d){ return d.value; })) || 1;
+    var bh = Math.min(46, innerH / data.length - 10);
+    data.forEach(function(d, i){
+      var y = padT + i * (innerH / data.length) + ((innerH / data.length) - bh) / 2;
+      var w = Math.max(1, d.value / max * innerW);
+      var rect = svgEl("rect", { x: padL, y: y, width: w, height: bh, rx: 7,
+                                 fill: d.color || "var(--c1)", class: "bar", tabindex: "0" });
+      svg.appendChild(rect);
+      var lab = svgEl("text", { x: padL - 10, y: y + bh / 2 + 4, "text-anchor": "end", class: "cat-label" }, d.label);
+      svg.appendChild(lab);
+      var val = svgEl("text", { x: padL + w + 8, y: y + bh / 2 + 4, class: "val-label" }, d.valueText);
+      svg.appendChild(val);
+      attachTip(rect, d.tip);
+      rect.addEventListener("focus", function(){
+        live.textContent = d.label + "：" + d.valueText + (d.extra ? "，" + d.extra : "");
+      });
+    });
+    svg.appendChild(svgEl("line", { x1: padL, y1: padT, x2: padL, y2: H - padB, class: "axis" }));
+    var cap = svgEl("text", { x: padL, y: H - 12, class: "axis-label" }, opts.caption || "");
+    svg.appendChild(cap);
+  }
+
+  function columnChart(svg, data, opts){
+    opts = opts || {};
+    var W = 620, H = 300, padL = 58, padR = 18, padT = 26, padB = 62;
+    var innerW = W - padL - padR, innerH = H - padT - padB;
+    var max = Math.max.apply(null, data.map(function(d){ return d.value; })) || 1;
+    var step = innerW / data.length;
+    var bw = Math.min(96, step * 0.5);
+    data.forEach(function(d, i){
+      var x = padL + i * step + (step - bw) / 2;
+      var h = Math.max(1, d.value / max * innerH);
+      var y = padT + innerH - h;
+      var rect = svgEl("rect", { x: x, y: y, width: bw, height: h, rx: 8,
+                                 fill: d.color || "var(--c1)", class: "bar", tabindex: "0" });
+      svg.appendChild(rect);
+      svg.appendChild(svgEl("text", { x: x + bw / 2, y: y - 8, "text-anchor": "middle", class: "val-label" }, d.valueText));
+      svg.appendChild(svgEl("text", { x: x + bw / 2, y: H - padB + 22, "text-anchor": "middle", class: "cat-label" }, d.label));
+      if (d.sub) svg.appendChild(svgEl("text", { x: x + bw / 2, y: H - padB + 40, "text-anchor": "middle", class: "axis-label" }, d.sub));
+      attachTip(rect, d.tip);
+      rect.addEventListener("focus", function(){
+        live.textContent = d.label + "：" + d.valueText + (d.extra ? "，" + d.extra : "");
+      });
+    });
+    svg.appendChild(svgEl("line", { x1: padL, y1: padT + innerH, x2: W - padR, y2: padT + innerH, class: "axis" }));
+    if (opts.caption) svg.appendChild(svgEl("text", { x: padL, y: 14, class: "axis-label" }, opts.caption));
+  }
+
+  function renderCharts(rows){
+    var totalRev = sum(rows, "revenue") || 1;
+
+    /* 年度收入趨勢 */
+    var byYear = group(rows, "year").sort(function(a,b){ return a.key < b.key ? -1 : 1; });
+    var ydata = byYear.map(function(g){
+      return {
+        label: g.key, value: g.revenue, valueText: fmt0(g.revenue),
+        sub: "訂單 " + g.n + " 筆",
+        tip: "<b>" + g.key + " 年</b><br>收入：" + fmt0(g.revenue) +
+             "<br>訂單：" + g.n + " 筆<br>數量：" + fmt0(g.qty) +
+             "<br>毛利率：" + fmtPct(g.revenue ? (g.revenue - g.cost) / g.revenue : 0),
+        extra: "訂單 " + g.n + " 筆"
+      };
+    });
+    chartCard(el("chart-year"), "年度收入趨勢",
+      byYear.length ? "報告期 " + byYear[0].key + "–" + byYear[byYear.length-1].key + "；柱上數字為該年收入合計" : "目前篩選無資料",
+      "年度收入長條圖：" + ydata.map(function(d){ return d.label + " 年 " + d.valueText; }).join("；"),
+      function(svg){
+        if (!ydata.length) { emptyNote(svg); return; }
+        columnChart(svg, ydata, { caption: "年度收入合計（UnitPrice × Qty）" });
+      },
+      { head: ["年份","訂單數","數量","收入","毛利率"],
+        rows: byYear.map(function(g){ return [g.key, g.n, fmt0(g.qty), fmt0(g.revenue), fmtPct(g.revenue ? (g.revenue-g.cost)/g.revenue : 0)]; }) });
+
+    /* 目的地收入 */
+    var byDest = group(rows, "dest").sort(function(a,b){ return b.revenue - a.revenue; });
+    var colors = ["var(--c1)","var(--c2)","var(--c3)","var(--c4)","var(--c5)","var(--c6)"];
+    var ddata = byDest.map(function(g, i){
+      var share = g.revenue / totalRev;
+      return {
+        label: g.key, value: g.revenue, valueText: fmt0(g.revenue) + "（" + fmtPct(share) + "）",
+        color: colors[i % colors.length],
+        tip: "<b>目的地 " + g.key + "</b><br>收入：" + fmt0(g.revenue) + "<br>佔比：" + fmtPct(share) +
+             "<br>訂單：" + g.n + " 筆<br>數量：" + fmt0(g.qty) +
+             "<br>毛利率：" + fmtPct(g.revenue ? (g.revenue - g.cost) / g.revenue : 0),
+        extra: "佔比 " + fmtPct(share)
+      };
+    });
+    chartCard(el("chart-dest"), "目的地收入分佈",
+      "依目前篩選之收入合計與佔比，由高至低排列",
+      "目的地收入長條圖：" + ddata.map(function(d){ return d.label + " " + d.valueText; }).join("；"),
+      function(svg){
+        if (!ddata.length) { emptyNote(svg); return; }
+        barChart(svg, ddata, { caption: "收入合計（括號內為佔比）" });
+      },
+      { head: ["目的地","訂單數","數量","收入","佔比","毛利率"],
+        rows: byDest.map(function(g){ return [g.key, g.n, fmt0(g.qty), fmt0(g.revenue),
+          fmtPct(g.revenue/totalRev), fmtPct(g.revenue ? (g.revenue-g.cost)/g.revenue : 0)]; }) });
+
+    /* 產品收入 */
+    var byProd = group(rows, "product").sort(function(a,b){ return b.revenue - a.revenue; });
+    var pdata = byProd.map(function(g, i){
+      var share = g.revenue / totalRev;
+      return {
+        label: g.key, value: g.revenue, valueText: fmt0(g.revenue) + "（" + fmtPct(share) + "）",
+        color: colors[i % colors.length],
+        tip: "<b>產品 " + g.key + "</b><br>收入：" + fmt0(g.revenue) + "<br>佔比：" + fmtPct(share) +
+             "<br>訂單：" + g.n + " 筆<br>數量：" + fmt0(g.qty) +
+             "<br>毛利率：" + fmtPct(g.revenue ? (g.revenue - g.cost) / g.revenue : 0),
+        extra: "佔比 " + fmtPct(share)
+      };
+    });
+    chartCard(el("chart-prod"), "產品收入分佈",
+      "六個產品（PTS-10 至 PTS-15）之收入合計與佔比",
+      "產品收入長條圖：" + pdata.map(function(d){ return d.label + " " + d.valueText; }).join("；"),
+      function(svg){
+        if (!pdata.length) { emptyNote(svg); return; }
+        barChart(svg, pdata, { caption: "收入合計（括號內為佔比）" });
+      },
+      { head: ["產品","訂單數","數量","收入","佔比","毛利率"],
+        rows: byProd.map(function(g){ return [g.key, g.n, fmt0(g.qty), fmt0(g.revenue),
+          fmtPct(g.revenue/totalRev), fmtPct(g.revenue ? (g.revenue-g.cost)/g.revenue : 0)]; }) });
+
+    /* 各地區毛利率 */
+    var mdata = byDest.map(function(g, i){
+      var m = g.revenue ? (g.revenue - g.cost) / g.revenue : 0;
+      return {
+        label: g.key, value: m, valueText: fmtPct(m), color: colors[i % colors.length],
+        tip: "<b>目的地 " + g.key + "</b><br>毛利率：" + fmtPct(m) +
+             "<br>收入：" + fmt0(g.revenue) + "<br>成本：" + fmt0(g.cost) + "<br>毛利：" + fmt0(g.revenue - g.cost),
+        extra: "收入 " + fmt0(g.revenue)
+      };
+    }).sort(function(a,b){ return b.value - a.value; });
+    chartCard(el("chart-margin"), "各地區毛利率比較",
+      "毛利率 =（收入 − 成本）÷ 收入；全期整體為 32.79%",
+      "地區毛利率長條圖：" + mdata.map(function(d){ return d.label + " " + d.valueText; }).join("；"),
+      function(svg){
+        if (!mdata.length) { emptyNote(svg); return; }
+        barChart(svg, mdata, { caption: "毛利率（收入 − 成本）÷ 收入", padL: 84 });
+      },
+      { head: ["目的地","收入","成本","毛利","毛利率"],
+        rows: byDest.map(function(g){ return [g.key, fmt0(g.revenue), fmt0(g.cost),
+          fmt0(g.revenue - g.cost), fmtPct(g.revenue ? (g.revenue-g.cost)/g.revenue : 0)]; }) });
+  }
+
+  function emptyNote(svg){
+    svg.appendChild(svgEl("text", { x: 310, y: 150, "text-anchor": "middle", class: "cat-label" }, "目前篩選條件下沒有資料"));
+  }
+
+  /* ===== 明細表 ===== */
+  function renderTable(rows){
+    var sorted = rows.slice().sort(function(a, b){
+      var k = sortState.key, x = a[k], y = b[k];
+      if (typeof x === "number" && typeof y === "number") return (x - y) * sortState.dir;
+      return String(x).localeCompare(String(y), "zh-Hant") * sortState.dir;
+    });
+    var tb = el("tbody");
+    tb.textContent = "";
+    sorted.forEach(function(d){
+      var tr = document.createElement("tr");
+      var cells = [
+        { t: d.inv }, { t: d.date }, { t: d.product }, { t: d.customer }, { t: d.dest, tag: true },
+        { t: fmt0(d.unit_price), n: true }, { t: fmt0(d.unit_cost), n: true }, { t: fmt0(d.qty), n: true },
+        { t: fmt0(d.revenue), n: true }, { t: fmt0(d.cost), n: true },
+        { t: fmtPct(d.margin), n: true, margin: d.margin }
+      ];
+      cells.forEach(function(c){
+        var td = document.createElement("td");
+        td.textContent = c.t;
+        if (c.n) td.className = "num";
+        if (c.tag) { var s = document.createElement("span"); s.className = "tag"; s.textContent = c.t; td.textContent = ""; td.appendChild(s); }
+        if (c.margin !== undefined && c.margin === 0) { td.textContent = ""; var s2 = document.createElement("span"); s2.className = "tag tag--warn"; s2.textContent = "0.0%（單價＝成本）"; td.appendChild(s2); }
+        tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+    el("tableStatus").textContent = "顯示 " + sorted.length + " / " + DATA.length + " 筆；點欄位標題可排序";
+    Array.prototype.forEach.call(document.querySelectorAll("thead th button"), function(b){
+      var on = b.getAttribute("data-sort") === sortState.key;
+      b.setAttribute("aria-sort", on ? (sortState.dir === 1 ? "ascending" : "descending") : "none");
+      b.querySelector("span").textContent = on ? (sortState.dir === 1 ? "↑" : "↓") : "↕";
+    });
+  }
+
+  /* ===== 主流程 ===== */
+  function render(){
+    var rows = DATA.filter(matches);
+    renderKpis(rows);
+    renderCharts(rows);
+    renderTable(rows);
+    var parts = [];
+    if (state.dest.length)    parts.push("目的地：" + state.dest.join("、"));
+    if (state.product.length) parts.push("產品：" + state.product.join("、"));
+    if (state.year.length)    parts.push("年份：" + state.year.join("、"));
+    if (state.q)              parts.push("搜尋：" + state.q);
+    el("filterStatus").textContent = parts.length
+      ? "目前篩選：" + parts.join("｜") + "　→ 符合 " + rows.length + " 筆訂單"
+      : "未套用篩選，顯示全部 " + DATA.length + " 筆訂單";
+    live.textContent = "已更新，符合 " + rows.length + " 筆訂單";
+  }
+
+  var NUMERIC = { unit_price:1, unit_cost:1, qty:1, revenue:1, cost:1, margin:1 };
+  document.querySelectorAll("thead th button").forEach(function(b){
+    b.addEventListener("click", function(){
+      var k = b.getAttribute("data-sort");
+      if (sortState.key === k) sortState.dir = -sortState.dir;
+      else { sortState.key = k; sortState.dir = NUMERIC[k] ? -1 : 1; }   // 數值欄首點由大到小
+      renderTable(DATA.filter(matches));
+    });
+  });
+
+  var qTimer = null;
+  el("q").addEventListener("input", function(e){
+    var v = e.target.value;
+    window.clearTimeout(qTimer);
+    qTimer = window.setTimeout(function(){ state.q = v.trim(); render(); }, 120);
+  });
+
+  el("resetBtn").addEventListener("click", function(){
+    state.dest = []; state.product = []; state.year = []; state.q = "";
+    el("q").value = "";
+    Array.prototype.forEach.call(document.querySelectorAll("#f-dest input, #f-prod input, #f-year input"), function(cb){ cb.checked = false; });
+    sortState.key = "date"; sortState.dir = 1;
+    render();
+    live.textContent = "已重設全部篩選";
+  });
+
+  el("printBtn").addEventListener("click", function(){ window.print(); });
+
+  var THEME_KEY = "dashboard.theme";
+  try { var sv = localStorage.getItem(THEME_KEY); if (sv === "light" || sv === "dark") document.documentElement.dataset.theme = sv; } catch(e){}
+  el("themeBtn").addEventListener("click", function(){
+    var isDark = document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = isDark ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem(THEME_KEY, next); } catch(e){}
+    live.textContent = "已切換為" + (next === "dark" ? "深色" : "淺色") + "模式";
+  });
+
+  buildChips("f-dest", "dest");
+  buildChips("f-prod", "product");
+  buildChips("f-year", "year");
+  render();
+})();
+</script>
+</body>
+</html>

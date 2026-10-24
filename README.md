@@ -6,6 +6,7 @@ Two self-contained pages, published with GitHub Pages.
 |---|---|---|
 | Todo list app | https://paullaucwgmail.github.io/Paul/ | Interactive todo list (add / mark done / delete) |
 | Meeting deck | https://paullaucwgmail.github.io/Paul/deck/ | Traditional-Chinese presentation built from the one-hour meeting record |
+| Sales dashboard | https://paullaucwgmail.github.io/Paul/dashboard/ | Interactive Traditional-Chinese dashboard for `Dashboard_Data.xlsx` |
 
 ## Pages
 
@@ -36,11 +37,24 @@ design, risks, opportunities, timeline, next steps.
 - Dark/light mode, `prefers-reduced-motion`, ARIA labels and a live region
 - Every claim traces to the source document; nothing was invented
 
+### `dashboard/index.html` — Sales dashboard
+
+Interactive dashboard built strictly from `Dashboard_Data.xlsx` (sheet `SalesData`, 99 orders,
+2018-01-11 → 2020-12-27): KPI cards, four inline-SVG charts (annual revenue, revenue by
+destination, revenue by product, gross margin by destination) with hover tooltips and
+per-chart data tables, checkbox filters for destination/product/year, a debounced search box,
+a reset control and a sortable/searchable 99-row detail table.
+
+Revenue follows the workbook's own formula (`SA1 = UnitPrice × Qty`); cost = `UnitCost × Qty`.
+The source states no currency, so amounts are shown as raw numbers and that is noted on the
+page. The hidden `PivotTable Answers` sheet and the workbook's legacy metadata were excluded.
+
 ## Project layout
 
 ```
 index.html                     todo app (self-contained)
 deck/index.html                meeting deck (self-contained)
+dashboard/index.html           sales dashboard (self-contained)
 .github/workflows/deploy.yml   build + deploy to GitHub Pages
 dist/                          build output (generated in CI, not committed)
 ```
