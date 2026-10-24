@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>新版 AI 課程與 OpenClaw Demo：方向與資源對齊｜一小時會議紀錄</title>
+<style>
+  /* ============ 設計代幣 ============ */
+  :root{
+    --bg:#eef1f6; --slide:#ffffff; --slide-2:#f6f8fb;
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0;
+    --accent:#1d4ed8; --accent-2:#0e7490; --accent-soft:#e8efff;
+    --warn:#b45309; --warn-soft:#fef6e7; --ok:#047857; --ok-soft:#e7f6ef;
+    --danger:#b91c1c; --danger-soft:#fdecec;
+    --ring:rgba(29,78,216,.35);
+    --shadow:0 1px 2px rgba(15,23,42,.05), 0 18px 44px -22px rgba(15,23,42,.35);
+    --r-lg:20px; --r-md:14px; --r-sm:10px;
+    --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:24px; --sp6:32px; --sp7:48px;
+    --t:200ms cubic-bezier(.2,.7,.3,1);
+    --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",ui-sans-serif,system-ui,
+           -apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#080b12; --slide:#111725; --slide-2:#161d2e;
+      --ink:#eef2f8; --ink-2:#c7d2e0; --muted:#93a1b5; --line:#26314a;
+      --accent:#7fa6ff; --accent-2:#5eead4; --accent-soft:#1a2340; --warn:#fbbf24; --warn-soft:#2a2113;
+      --ok:#34d399; --ok-soft:#0f2a22; --danger:#fca5a5; --danger-soft:#2c1616;
+      --ring:rgba(127,166,255,.4);
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 22px 50px -24px rgba(0,0,0,.85);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1f6; --slide:#fff; --slide-2:#f6f8fb; --ink:#0f172a; --ink-2:#334155;
+    --muted:#64748b; --line:#e2e8f0; --accent:#1d4ed8; --accent-2:#0e7490;
+    --accent-soft:#e8efff; --warn:#b45309; --warn-soft:#fef6e7; --ok:#047857;
+    --ok-soft:#e7f6ef; --danger:#b91c1c; --danger-soft:#fdecec;
+    --ring:rgba(29,78,216,.35);
+    --shadow:0 1px 2px rgba(15,23,42,.05), 0 18px 44px -22px rgba(15,23,42,.35);
+  }
+  :root[data-theme="dark"]{
+    --bg:#080b12; --slide:#111725; --slide-2:#161d2e; --ink:#eef2f8; --ink-2:#c7d2e0;
+    --muted:#93a1b5; --line:#26314a; --accent:#7fa6ff; --accent-2:#5eead4;
+    --accent-soft:#1a2340; --warn:#fbbf24; --warn-soft:#2a2113; --ok:#34d399;
+    --ok-soft:#0f2a22; --danger:#fca5a5; --danger-soft:#2c1616;
+    --ring:rgba(127,166,255,.4);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 22px 50px -24px rgba(0,0,0,.85);
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+    line-height:1.65;-webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  button{font:inherit;color:inherit}
+
+  /* ============ 舞台 ============ */
+  .stage{position:fixed;inset:0;display:grid;place-items:center;padding:var(--sp5)}
+  .deck{position:relative;width:min(1280px,100%);aspect-ratio:16/9;
+        max-height:calc(100vh - 2*var(--sp5))}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    background:var(--slide);border:1px solid var(--line);border-radius:var(--r-lg);
+    box-shadow:var(--shadow);padding:clamp(20px,3.4vw,52px) clamp(22px,4vw,64px);
+    overflow:hidden;
+  }
+  .slide.is-active{display:flex;animation:fade var(--t) both}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ============ 內容元件 ============ */
+  .kicker{
+    display:inline-flex;align-items:center;gap:var(--sp2);
+    font-size:clamp(11px,1.05vw,13.5px);font-weight:700;letter-spacing:.06em;
+    color:var(--accent);text-transform:none;margin-bottom:var(--sp2);
+  }
+  .kicker::before{content:"";width:22px;height:3px;border-radius:2px;background:var(--accent)}
+  h1{font-size:clamp(24px,3.5vw,46px);line-height:1.22;margin:0 0 var(--sp3);letter-spacing:-.01em}
+  h2{font-size:clamp(19px,2.35vw,31px);line-height:1.3;margin:0 0 var(--sp4);letter-spacing:-.01em}
+  h3{font-size:clamp(14px,1.35vw,17px);margin:0 0 var(--sp2);color:var(--ink)}
+  p{margin:0 0 var(--sp3);color:var(--ink-2);font-size:clamp(13px,1.28vw,16.5px)}
+  .lede{font-size:clamp(14px,1.5vw,19px);color:var(--ink-2);max-width:62ch}
+  .body{flex:1;min-height:0;display:flex;flex-direction:column;gap:var(--sp4)}
+  .muted{color:var(--muted)}
+  .small{font-size:clamp(11.5px,1.1vw,13.5px)}
+  strong{color:var(--ink);font-weight:700}
+  .nowrap{white-space:nowrap}
+
+  .grid{display:grid;gap:var(--sp4)}
+  .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  @media (max-width:900px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--slide-2);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:var(--sp4) var(--sp4);
+  }
+  .card--accent{border-left:4px solid var(--accent)}
+  .card--warn{background:var(--warn-soft);border-color:transparent}
+  .card--ok{background:var(--ok-soft);border-color:transparent}
+  .card--danger{background:var(--danger-soft);border-color:transparent}
+  .card__label{font-size:clamp(11px,1.05vw,13px);font-weight:700;letter-spacing:.04em;color:var(--muted);margin-bottom:var(--sp1)}
+  .card p:last-child{margin-bottom:0}
+
+  ul.clean{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp3)}
+  ul.clean li{position:relative;padding-left:var(--sp5);color:var(--ink-2);font-size:clamp(13px,1.25vw,16px)}
+  ul.clean li::before{
+    content:"";position:absolute;left:6px;top:.62em;width:7px;height:7px;border-radius:50%;
+    background:var(--accent);
+  }
+  ul.clean li.is-warn::before{background:var(--warn)}
+  ul.clean li.is-ok::before{background:var(--ok)}
+
+  .stat{display:flex;align-items:baseline;gap:var(--sp2)}
+  .stat__n{font-size:clamp(26px,3.1vw,42px);font-weight:800;letter-spacing:-.02em;color:var(--accent)}
+  .stat__u{font-size:clamp(12px,1.15vw,14px);color:var(--muted);font-weight:600}
+
+  .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:clamp(11px,1vw,12.5px);
+       font-weight:700;background:var(--accent-soft);color:var(--accent)}
+  .tag--warn{background:var(--warn-soft);color:var(--warn)}
+  .tag--ok{background:var(--ok-soft);color:var(--ok)}
+  .tag--danger{background:var(--danger-soft);color:var(--danger)}
+  .tag--muted{background:var(--slide-2);color:var(--muted);border:1px solid var(--line)}
+
+  table.data{width:100%;border-collapse:collapse;font-size:clamp(12px,1.15vw,14.5px)}
+  table.data th,table.data td{text-align:left;padding:var(--sp3);border-bottom:1px solid var(--line);vertical-align:top}
+  table.data th{color:var(--muted);font-weight:700;font-size:clamp(11px,1.05vw,13px);letter-spacing:.03em}
+  table.data tr:last-child td{border-bottom:none}
+
+  .note{
+    margin-top:auto;display:flex;gap:var(--sp3);align-items:flex-start;
+    background:var(--slide-2);border-radius:var(--r-sm);padding:var(--sp3) var(--sp4);
+    font-size:clamp(11.5px,1.08vw,13.5px);color:var(--muted);
+  }
+  .note b{color:var(--ink-2)}
+
+  .flow{display:flex;align-items:stretch;gap:var(--sp2);flex-wrap:wrap}
+  .flow__step{
+    flex:1 1 150px;background:var(--slide-2);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:var(--sp3) var(--sp4);position:relative;
+  }
+  .flow__step::after{
+    content:"";position:absolute;right:-9px;top:50%;width:9px;height:2px;background:var(--line);
+  }
+  .flow__step:last-child::after{display:none}
+  .flow__n{font-size:clamp(11px,1vw,12.5px);font-weight:800;color:var(--accent);letter-spacing:.06em}
+
+  svg .tl-line{stroke:var(--line);stroke-width:3;fill:none}
+  svg .tl-dot{fill:var(--accent)}
+  svg text{font-family:var(--font);fill:var(--ink-2)}
+  svg .tl-date{fill:var(--muted);font-size:13px;font-weight:700}
+  svg .tl-label{fill:var(--ink);font-size:14px;font-weight:600}
+
+  /* ============ 外框：進度、頁碼、控制 ============ */
+  .chrome{position:fixed;left:0;right:0;bottom:0;pointer-events:none}
+  .progress{height:3px;background:var(--line)}
+  .progress__bar{height:100%;width:0;background:var(--accent);transition:width var(--t)}
+  .controls{
+    pointer-events:auto;display:flex;align-items:center;gap:var(--sp2);
+    padding:var(--sp2) var(--sp4) var(--sp3);justify-content:center;flex-wrap:wrap;
+  }
+  .btn{
+    appearance:none;border:1px solid var(--line);background:var(--slide);cursor:pointer;
+    border-radius:var(--r-sm);padding:9px 14px;font-size:clamp(12px,1.1vw,14px);font-weight:600;
+    transition:background var(--t),border-color var(--t),transform var(--t),color var(--t);
+    display:inline-flex;align-items:center;gap:var(--sp2);
+  }
+  .btn:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.97)}
+  .btn[disabled]{opacity:.45;cursor:default}
+  .btn[disabled]:hover{background:var(--slide);border-color:var(--line);color:inherit}
+  .btn--icon{padding:9px 11px}
+  .pager{
+    font-variant-numeric:tabular-nums;font-weight:700;font-size:clamp(12px,1.1vw,14px);
+    color:var(--ink-2);min-width:88px;text-align:center;
+  }
+  .pager span{color:var(--muted);font-weight:600}
+  .badge{position:fixed;top:14px;left:14px;pointer-events:none}
+  .badge span{font-size:11.5px;color:var(--muted);background:var(--slide);
+              border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+
+  /* ============ 講者備註 ============ */
+  .notes{display:none}
+  .notes-panel{
+    position:fixed;left:0;right:0;bottom:0;max-height:46vh;overflow:auto;z-index:40;
+    background:var(--slide);border-top:1px solid var(--line);box-shadow:var(--shadow);
+    padding:var(--sp5) clamp(20px,4vw,64px) var(--sp6);display:none;
+  }
+  .notes-panel.is-open{display:block}
+  .notes-panel h3{margin-bottom:var(--sp3)}
+  .notes-panel ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp2)}
+  .notes-panel li{font-size:clamp(12px,1.15vw,14.5px);color:var(--ink-2);padding-left:var(--sp4);position:relative}
+  .notes-panel li::before{content:"—";position:absolute;left:0;color:var(--muted)}
+  .notes-panel__close{margin-top:var(--sp4)}
+
+  /* ============ 總覽 ============ */
+  .overview{
+    position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,#000 12%);
+    overflow:auto;padding:var(--sp6) clamp(16px,4vw,48px) 96px;display:none;
+  }
+  .overview.is-open{display:block}
+  .overview__head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp4);margin-bottom:var(--sp5)}
+  .overview__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:var(--sp4)}
+  .thumb{
+    text-align:left;background:var(--slide);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:var(--sp4);cursor:pointer;display:flex;flex-direction:column;gap:var(--sp2);
+    transition:border-color var(--t),transform var(--t),box-shadow var(--t);
+  }
+  .thumb:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .thumb.is-current{border-color:var(--accent);background:var(--accent-soft)}
+  .thumb__n{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.06em}
+  .thumb__t{font-size:clamp(13px,1.2vw,15px);font-weight:700;color:var(--ink);line-height:1.4}
+
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+           clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+  /* ============ 列印 ============ */
+  @page{size:A4 landscape;margin:10mm}
+  @media print{
+    body{overflow:visible;background:#fff}
+    .stage{position:static;display:block;padding:0}
+    .deck{position:static;width:auto;aspect-ratio:auto;max-height:none}
+    .slide{
+      position:static;display:flex !important;animation:none;
+      page-break-after:always;break-after:page;break-inside:avoid;
+      border:none;box-shadow:none;border-radius:0;height:auto;min-height:0;
+      padding:0 0 8mm;color:#000;
+    }
+    .slide:last-child{page-break-after:auto;break-after:auto}
+    .chrome,.overview,.notes-panel,.badge{display:none !important}
+    .notes{display:block !important;margin-top:6mm;border-top:1px solid #ccc;padding-top:3mm}
+    .notes h3{font-size:11pt}
+    .notes li{font-size:9.5pt;color:#333}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="badge"><span>會議紀錄簡報｜2026-07-06</span></div>
+
+<div class="stage">
+  <div class="deck" id="deck" role="region" aria-roledescription="簡報" aria-label="新版 AI 課程與 OpenClaw Demo 方向與資源對齊">
+
+    <!-- 1 封面 -->
+    <section class="slide" id="s1" data-title="封面：新版 AI 課程與 OpenClaw Demo" aria-label="第 1 張，共 13 張：封面">
+      <div class="kicker">一小時會議紀錄</div>
+      <h1>新版 AI 課程與 OpenClaw Demo<br>方向與資源對齊</h1>
+      <p class="lede">未來三個月要推新版 AI 課程與 OpenClaw demo，本次會議先對齊方向與資源安排。</p>
+      <div class="body">
+        <div class="grid g3">
+          <div class="card card--accent">
+            <div class="card__label">會議時間</div>
+            <p><strong>2026-07-06（一）20:00–21:00</strong><br><span class="small muted">約一小時</span></p>
+          </div>
+          <div class="card card--accent">
+            <div class="card__label">平台</div>
+            <p><strong>Teams 線上會議</strong></p>
+          </div>
+          <div class="card card--accent">
+            <div class="card__label">參加者（5 人）</div>
+            <p>Johnny、Ken（PM）、May（Trainer）、Ivan（技術支援）、Ada（營運）</p>
+          </div>
+        </div>
+        <div class="note"><b>資料來源：</b>《一小時會議原始記錄》全文。本簡報只採用該檔案的事實、數據與結論，未加入任何外部資料。</div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>時間：2026-07-06 20:00–21:00（約一小時）；平台：Teams 線上會議。</li>
+          <li>參加者：Johnny、Ken（PM）、May（Trainer）、Ivan（技術支援）、Ada（營運）。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2 背景 -->
+    <section class="slide" id="s2" data-title="背景：三個月推新版 AI 課程與 OpenClaw demo" aria-label="第 2 張，共 13 張：背景">
+      <div class="kicker">背景</div>
+      <h2>未來三個月要推新版 AI 課程與 OpenClaw demo，先對齊方向與資源</h2>
+      <div class="body">
+        <p class="lede">Johnny 開場說明會議目的：之後三個月要推新版 AI 課程同 OpenClaw demo，想先對齊方向同資源安排。</p>
+        <div class="grid g3">
+          <div class="card">
+            <div class="card__label">客戶近期常問</div>
+            <p>Generative AI 實務應用</p>
+          </div>
+          <div class="card">
+            <div class="card__label">客戶近期常問</div>
+            <p>Security Copilot</p>
+          </div>
+          <div class="card">
+            <div class="card__label">客戶近期常問</div>
+            <p>AB-730 準備</p>
+          </div>
+        </div>
+        <div class="card card--accent">
+          <h3>會議的起點判斷</h3>
+          <p>上述三類客戶需求，覺得要整合落同一條路線。</p>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Johnny 開場，大概講今次 meeting 目的：之後三個月要推新版 AI 課程同 OpenClaw demo，想先對齊方向同資源安排。</li>
+          <li>講到最近客戶問得多「Generative AI 實務應用」、「Security Copilot」、「AB-730 準備」，覺得要整合落同一條路線。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3 現況 -->
+    <section class="slide" id="s3" data-title="現況：8 月已有一個 3 小時客戶需求" aria-label="第 3 張，共 13 張：現況">
+      <div class="kicker">現況</div>
+      <h2>8 月至少有一個觀塘客戶：30 人、3 小時 Copilot 培訓、對象為 senior management</h2>
+      <div class="body">
+        <div class="grid g4">
+          <div class="card">
+            <div class="card__label">時間</div>
+            <div class="stat"><span class="stat__n">8 月</span></div>
+            <p class="small muted">至少一個觀塘客戶</p>
+          </div>
+          <div class="card">
+            <div class="card__label">對象</div>
+            <div class="stat"><span class="stat__n">30</span><span class="stat__u">人</span></div>
+            <p class="small muted">target senior management</p>
+          </div>
+          <div class="card">
+            <div class="card__label">時長</div>
+            <div class="stat"><span class="stat__n">3</span><span class="stat__u">小時</span></div>
+            <p class="small muted">Copilot 培訓</p>
+          </div>
+          <div class="card">
+            <div class="card__label">客戶要求交付</div>
+            <p class="small">trainer profile、course outline、quotation</p>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card card--accent">
+            <h3>客戶要求的內容重點</h3>
+            <p>報告、簡報、資料整理、自動化、治理同安全。</p>
+          </div>
+          <div class="card card--ok">
+            <h3>本次會議的額外目標</h3>
+            <p>Johnny 希望今次 meeting 可以順便 fix 埋個基本架構，之後容易複製去其他客戶。</p>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Johnny 話 8 月至少有一個觀塘客戶，target senior management，大約 30 人，要求 3 小時 Copilot 培訓，之前有 send 過照片講需求。</li>
+          <li>內容重點：報告、簡報、資料整理、自動化、治理同安全，仲要 trainer profile、course outline、quotation。</li>
+          <li>Johnny 強調，希望今次 meeting 可以順便 fix 埋個基本架構，之後容易複製去其他客戶。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4 主要發現 -->
+    <section class="slide" id="s4" data-title="主要發現：五項會議共識" aria-label="第 4 張，共 13 張：主要發現">
+      <div class="kicker">主要發現</div>
+      <h2>會議形成五項共識：包裝要清晰、先推 3 小時、治理必備、多 demo、結構可重用</h2>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card card--accent">
+            <h3>① 包裝要清晰、不技術化，但要顯得落地且安全</h3>
+            <p>Ken（marketing）：課程 title 同 description 要清晰，唔好太 technical，但又要俾管理層覺得落地同安全。</p>
+          </div>
+          <div class="card card--accent">
+            <h3>② 6 小時對管理層可能太長，先試 3 小時</h3>
+            <p>Ken：6 小時對管理層可能太長，client 可能先試 3 小時 version，再諗 extension。</p>
+          </div>
+          <div class="card card--accent">
+            <h3>③ 市場需求集中在安全與治理</h3>
+            <p>Ken：最近幾個 inquiry 都會問「AI 安全」、「資料會唔會出外」、「有冇 best practice / policy」。</p>
+          </div>
+          <div class="card card--accent">
+            <h3>④ 教學風格：少理論、多 demo、用學員真實文件</h3>
+            <p>Johnny：希望 Copilot 課同 Generative AI workshop 都可以保持「由 0 到 1 + 由文件到 slide」的 workflow，唔好只停留在 chat box 層面。</p>
+          </div>
+        </div>
+        <div class="card card--accent">
+          <h3>⑤ 需要一套可跨客戶重用、同時可換工具的結構</h3>
+          <p>Johnny：想要一套可以跨客戶重用的結構，同時保留彈性可以 swap 出唔同工具（Gemini、Kimi 等）。</p>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Ken 提議用「AI Productivity + Governance」做 umbrella，底下拆 workshop。</li>
+          <li>May 建議 3 小時唔好塞太多 module（詳見「3 小時版時間分配」一頁）。</li>
+          <li>Ivan 提醒要準備 fallback；Ada 提出先做 template 方便 quotation 同 timetable。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5 支持證據 -->
+    <section class="slide" id="s5" data-title="支持證據：客戶提問主題決定 outline 必須有治理" aria-label="第 5 張，共 13 張：支持證據">
+      <div class="kicker">支持證據</div>
+      <h2>客戶提問集中在安全與治理，因此 outline 至少要有一個 governance section</h2>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card">
+            <div class="card__label">Ken 分享的近期 inquiry 主題</div>
+            <ul class="clean">
+              <li>AI 安全</li>
+              <li>資料會唔會出外</li>
+              <li>有冇 best practice / policy</li>
+            </ul>
+          </div>
+          <div class="card card--ok">
+            <div class="card__label">由此得出的要求</div>
+            <ul class="clean">
+              <li class="is-ok">課程裏面要有至少一個 section 專講 governance</li>
+              <li class="is-ok">清楚寫喺 outline 裏面，方便 sales 解釋</li>
+              <li class="is-ok">Ken 提問：係咪可以喺最後 30 分鐘做「企業 AI 使用守則 + Q&A」</li>
+            </ul>
+            <p class="small muted" style="margin-top:12px">May 回覆：ok。</p>
+          </div>
+        </div>
+        <div class="note"><b>另一項客戶面證據：</b>8 月觀塘客戶要求的內容重點為報告、簡報、資料整理、自動化、治理同安全——與上述提問方向一致。</div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Ken 再拉返去 marketing demand。他分享最近幾個 inquiry：客戶都會問「AI 安全」、「資料會唔會出外」、「有冇 best practice / policy」。</li>
+          <li>佢覺得課程裏面要有至少一個 section 專講 governance，同清楚寫喺 outline 裏面，方便 sales 解釋。</li>
+          <li>佢問 May：係咪可以喺最後 30 分鐘做一個「企業 AI 使用守則 + Q&A」？May 話 ok。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 6 課程架構 -->
+    <section class="slide" id="s6" data-title="方案：6 小時主幹拆三個 2 小時模組" aria-label="第 6 張，共 13 張：課程架構">
+      <div class="kicker">方案架構</div>
+      <h2>主幹為 6 小時一日課（MS-4017 + Copilot training），拆成 3 個模組、每模組 2 小時</h2>
+      <div class="body">
+        <div class="grid g3">
+          <div class="card card--accent">
+            <div class="card__label">Module 1 ｜ 2 小時</div>
+            <h3>Copilot Chat</h3>
+            <p>理解定位、prompt 基礎、Chat + web context。</p>
+          </div>
+          <div class="card card--accent">
+            <div class="card__label">Module 2 ｜ 2 小時</div>
+            <h3>365 Copilot features</h3>
+            <p>Word／Excel／PowerPoint／Outlook demo + hands-on。</p>
+          </div>
+          <div class="card card--accent">
+            <div class="card__label">Module 3 ｜ 2 小時</div>
+            <h3>Use cases + create agent</h3>
+            <p>case study、Copilot Chat agent、governance。</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>外加延伸：Security Copilot + AB-730 applied skill session</h3>
+          <p>可能係另一日，或者當作 extension module 畀 IT／security audience。</p>
+        </div>
+        <div class="note"><b>會議現場評語：</b>Ken 話呢個 split 清晰，但 6 小時對管理層可能太長，client 可能先試 3 小時 version，再諗 extension。</div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Johnny 解釋暫時構思：主幹用 MS-4017 + Copilot training 做 6 小時一日課，拆成 3 個 module，每個 2 小時。</li>
+          <li>然後額外加一個「Security Copilot + AB-730」的 applied skill session，可能係另一日，或者當作 extension module 畀 IT / security audience。</li>
+          <li>Johnny 補充想在第三部分加「Copilot Chat create agent」示範，因為個 client 對「AI agent」好有興趣。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7 兩個版本比較 -->
+    <section class="slide" id="s7" data-title="比較：A 版 3 小時與 B 版 6 小時" aria-label="第 7 張，共 13 張：兩版比較">
+      <div class="kicker">趨勢或比較</div>
+      <h2>Ivan 建議預先準備兩個版本，讓 sales 依客戶 budget 與需求選擇</h2>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card card--ok">
+            <div class="card__label">A 版</div>
+            <h3>3 小時 management briefing + light demo</h3>
+            <p class="small muted">對應 Ken 的觀察：管理層可能先試 3 小時版本，再考慮 extension。</p>
+          </div>
+          <div class="card card--accent">
+            <div class="card__label">B 版</div>
+            <h3>6 小時深入 version</h3>
+            <p>加入 extensibility、Security Copilot、agent demo。</p>
+          </div>
+        </div>
+        <div class="card card--warn">
+          <h3>Ivan 同時提醒（前置條件）</h3>
+          <p>要喺 internal file 入面清楚寫 licensing requirement，同每個 demo 用邊個 tenant。</p>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Ivan 建議，可以預先準備兩個版本：A 版 3 小時 management briefing + light demo；B 版 6 小時深入 version，加入 extensibility、Security Copilot、agent demo。</li>
+          <li>咁 sales 可以睇客戶 budget 同需求揀。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8 3 小時版時間分配 -->
+    <section class="slide" id="s8" data-title="3 小時版建議拆成三個 1 小時段落" aria-label="第 8 張，共 13 張：3 小時版時間分配">
+      <div class="kicker">方案細節</div>
+      <h2>May 建議 3 小時拆成三段各 1 小時，唔好塞太多 module</h2>
+      <div class="body">
+        <div class="flow">
+          <div class="flow__step">
+            <div class="flow__n">1 小時</div>
+            <h3>Copilot Chat 概念 + prompt framework</h3>
+          </div>
+          <div class="flow__step">
+            <div class="flow__n">1 小時</div>
+            <h3>365 apps demo</h3>
+            <p class="small muted">Word／Excel／PowerPoint／Outlook</p>
+          </div>
+          <div class="flow__step">
+            <div class="flow__n">1 小時</div>
+            <h3>case study + group exercise</h3>
+            <p class="small muted">包含 governance</p>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card card--ok">
+            <h3>前置經驗可換取更多 hands-on 時間</h3>
+            <p>如果學生之前已上過 MS-4018／MS-4004，就可以少啲「Copilot 是乜」個 introduction，時間留多啲做 hands-on。</p>
+          </div>
+          <div class="card">
+            <h3>第三部分可加示範</h3>
+            <p>Johnny 想加「Copilot Chat create agent」示範，因為個 client 對「AI agent」好有興趣，覺得比較貼到現在大部份 AI workshop 方向。</p>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>May 接手講教學部分。佢覺得 3 小時唔好塞太多 module，建議拆成：1 小時 Copilot Chat 概念 + prompt framework、1 小時 365 apps demo（Word/Excel/PowerPoint/Outlook），最後 1 小時用 case study + group exercise 包 governance。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9 Governance 設計 -->
+    <section class="slide" id="s9" data-title="治理設計：四個 check points 加分組練習" aria-label="第 9 張，共 13 張：治理設計">
+      <div class="kicker">方案細節</div>
+      <h2>Governance 用四個 check points 做結構，並以分組練習產出部門使用守則</h2>
+      <div class="body">
+        <div class="grid g4">
+          <div class="card"><div class="card__label">Check point 1</div><h3>資料分類</h3></div>
+          <div class="card"><div class="card__label">Check point 2</div><h3>使用場景</h3></div>
+          <div class="card"><div class="card__label">Check point 3</div><h3>審核流程</h3></div>
+          <div class="card"><div class="card__label">Check point 4</div><h3>風險示例</h3></div>
+        </div>
+        <div class="grid g2">
+          <div class="card card--accent">
+            <h3>Group exercise</h3>
+            <p>叫學員分組寫出自己部門的「AI 使用守則」，然後用 Copilot 幫佢 refine 成文件。</p>
+          </div>
+          <div class="card card--ok">
+            <h3>會後增值</h3>
+            <p>May 提議會後可以送一份「AI usage checklist」handout，增加 perceived value。</p>
+          </div>
+        </div>
+        <div class="note"><b>對應客戶要求：</b>8 月客戶要求的內容重點包含治理同安全；Ken 亦要求 outline 至少有一個 section 專講 governance。</div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>May 提議 Governance 部分可以用 3–4 個 check points 做結構：資料分類、使用場景、審核流程、風險示例。</li>
+          <li>做 group exercise，叫學員分組寫出自己部門的「AI 使用守則」，然後用 Copilot 幫佢 refine 成文件。</li>
+          <li>佢提議會後可以送一份「AI usage checklist」handout，增加 perceived value。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 10 風險與限制 -->
+    <section class="slide" id="s10" data-title="挑戰：授權、網絡與不可承諾事項" aria-label="第 10 張，共 13 張：風險與限制">
+      <div class="kicker">挑戰與限制</div>
+      <h2>技術可行性受制於網絡與授權，Security Copilot 不可預先承諾客戶可用</h2>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card card--warn">
+            <div class="card__label">風險 1 ｜ 環境與授權</div>
+            <ul class="clean">
+              <li class="is-warn">要留意現場網絡</li>
+              <li class="is-warn">要留意 M365 license 情況</li>
+              <li class="is-warn">如果 client 未必全部有 Copilot for M365，就要準備 fallback</li>
+            </ul>
+          </div>
+          <div class="card card--warn">
+            <div class="card__label">風險 2 ｜ Security Copilot</div>
+            <ul class="clean">
+              <li class="is-warn">唔可以 promise client 一定用到</li>
+              <li class="is-warn">license 條件同 region 限制要先查清楚</li>
+            </ul>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card card--ok">
+            <div class="card__label">已提出的 fallback 方案</div>
+            <p>用 demo tenant 或錄影 demo。</p>
+          </div>
+          <div class="card card--danger">
+            <div class="card__label">尚未有結論</div>
+            <p>Ivan 提問：Security Copilot 係想做「Applied Skill」加值 module，定係獨立半天課？<br><span class="small muted">會議紀錄未載最終決定。</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Ivan 由技術角度講 feasibility。佢提醒要留意現場網絡、M365 license 情況，如果 client 未必全部有 Copilot for M365，就要準備 fallback：用 demo tenant 或錄影 demo。</li>
+          <li>又講 Security Copilot 部分要小心，唔可以 promise client 一定用到，因為 license 條件同 region 限制要先查清楚。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 11 機遇：OpenClaw 與可重用結構 -->
+    <section class="slide" id="s11" data-title="機遇：OpenClaw 大班工作坊與可換工具的結構" aria-label="第 11 張，共 13 張：機遇">
+      <div class="kicker">機遇</div>
+      <h2>OpenClaw 2 小時大班工作坊與可換工具的課程結構，是本次會議提出的擴展方向</h2>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card card--accent">
+            <div class="card__label">新課方向</div>
+            <h3>OpenClaw 2 小時 workshop</h3>
+            <ul class="clean">
+              <li>專講 Generative AI、prompt vs prompt engineering、OpenClaw workflow</li>
+              <li>目標受眾：150 人大班</li>
+              <li class="is-warn">會議紀錄僅述「希望之後可以有一場」，未排期</li>
+            </ul>
+          </div>
+          <div class="card card--accent">
+            <div class="card__label">結構彈性</div>
+            <h3>可跨客戶重用、可換工具</h3>
+            <ul class="clean">
+              <li>一套可以跨客戶重用的結構</li>
+              <li>保留彈性可以 swap 出唔同工具（Gemini、Kimi 等）</li>
+              <li>Ada 提議先做兩個標準 template，方便 quotation 同 timetable</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Ada 提出的兩個標準 template</h3>
+          <p>「標準 3 小時 Copilot management version」與「標準 2 小時 Generative AI + OpenClaw workshop」。</p>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Johnny 提起 OpenClaw：希望之後可以有一場 2 小時 workshop，專講 Generative AI、prompt vs prompt engineering、OpenClaw workflow，畀 150 人大班用。</li>
+          <li>Ada 提議先做一個「標準 3 小時 Copilot management version」同「標準 2 小時 Generative AI + OpenClaw workshop」的 template，方便 quotation 同 timetable。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12 時間線 -->
+    <section class="slide" id="s12" data-title="時間線：由本次會議到 8 月交付" aria-label="第 12 張，共 13 張：時間線">
+      <div class="kicker">趨勢或比較</div>
+      <h2>時間線：會議後本週出中文版、下週一 follow-up、8 月交付客戶</h2>
+      <div class="body">
+        <svg viewBox="0 0 1000 210" role="img" aria-label="時間線：2026-07-06 會議，本週內完成中文版 outline，下星期一晚 45 分鐘 follow-up meeting，8 月觀塘客戶交付">
+          <line class="tl-line" x1="60" y1="105" x2="940" y2="105"></line>
+          <g>
+            <circle class="tl-dot" cx="120" cy="105" r="9"></circle>
+            <text class="tl-date" x="120" y="72" text-anchor="middle">2026-07-06</text>
+            <text class="tl-label" x="120" y="140" text-anchor="middle">方向與資源對齊</text>
+            <text x="120" y="162" text-anchor="middle" class="tl-date" style="font-weight:400">一小時會議（已舉行）</text>
+          </g>
+          <g>
+            <circle class="tl-dot" cx="390" cy="105" r="9"></circle>
+            <text class="tl-date" x="390" y="72" text-anchor="middle">本週內</text>
+            <text class="tl-label" x="390" y="140" text-anchor="middle">中文版 outline 出爐</text>
+            <text x="390" y="162" text-anchor="middle" class="tl-date" style="font-weight:400">3 小時 + 6 小時架構</text>
+          </g>
+          <g>
+            <circle class="tl-dot" cx="650" cy="105" r="9"></circle>
+            <text class="tl-date" x="650" y="72" text-anchor="middle">下星期一晚</text>
+            <text class="tl-label" x="650" y="140" text-anchor="middle">45 分鐘 follow-up</text>
+            <text x="650" y="162" text-anchor="middle" class="tl-date" style="font-weight:400">專注 outline 同 demo flow</text>
+          </g>
+          <g>
+            <circle class="tl-dot" cx="880" cy="105" r="9"></circle>
+            <text class="tl-date" x="880" y="72" text-anchor="middle">8 月</text>
+            <text class="tl-label" x="880" y="140" text-anchor="middle">觀塘客戶交付</text>
+            <text x="880" y="162" text-anchor="middle" class="tl-date" style="font-weight:400">3 小時 Copilot 培訓</text>
+          </g>
+        </svg>
+        <div class="note"><b>範圍說明：</b>原文明確提到「之後三個月要推新版 AI 課程同 OpenClaw demo」；除上述四個時點外，紀錄未載其他具體日期。「本週內」與「下星期一晚」為原文相對表述，以會議日 2026-07-06 為基準。</div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Johnny：負責起草 3 小時 Copilot management workshop outline，同 6 小時 full course module split，今週內先出中文版本。</li>
+          <li>大家同意，下星期一晚再開一個 45 分鐘 follow-up meeting，專注睇 outline 同 demo flow，視情況再加入 OpenClaw workshop 的設計。</li>
+          <li>8 月觀塘客戶：3 小時 Copilot 培訓，約 30 人。</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 13 下一步與總結 -->
+    <section class="slide" id="s13" data-title="下一步：四項分工與後續會議" aria-label="第 13 張，共 13 張：下一步與總結">
+      <div class="kicker">建議與下一步</div>
+      <h2>會後四項分工已明確，並約定下星期一晚 45 分鐘 follow-up</h2>
+      <div class="body">
+        <table class="data">
+          <thead>
+            <tr><th style="width:15%">負責人</th><th>工作項目</th><th style="width:22%">時間／對象</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Johnny</strong></td>
+              <td>起草 3 小時 Copilot management workshop outline，同 6 小時 full course module split</td>
+              <td>今週內先出中文版本</td>
+            </tr>
+            <tr>
+              <td><strong>May</strong></td>
+              <td>幫手寫教學重點同 demo rundown（每 15 分鐘內容），特別是 module 2、module 3 的實作部分</td>
+              <td>配合 outline 進度</td>
+            </tr>
+            <tr>
+              <td><strong>Ivan</strong></td>
+              <td>整理 technical prerequisite（license、tenant、network）同 demo checklist</td>
+              <td>配合 outline 進度</td>
+            </tr>
+            <tr>
+              <td><strong>Ken + Ada</strong></td>
+              <td>一齊設計 quotation template，同 marketing one-pager</td>
+              <td>用於 8 月觀塘客戶</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="grid g2">
+          <div class="card card--ok">
+            <h3>後續會議</h3>
+            <p>下星期一晚，45 分鐘 follow-up，專注睇 outline 同 demo flow；視情況再加入 OpenClaw workshop 的設計。</p>
+          </div>
+          <div class="card card--warn">
+            <h3>紀錄中仍待決定的事項</h3>
+            <ul class="clean">
+              <li class="is-warn">Security Copilot 定位：Applied Skill 加值 module 或獨立半天課（未定）</li>
+              <li class="is-warn">客戶最終選 3 小時或 6 小時（待客戶決定）</li>
+              <li class="is-warn">雙語版本：Johnny 話最好有 bilingual，但優先先出中文版本，英文由中文再翻譯</li>
+              <li class="is-warn">OpenClaw 2 小時工作坊未排期</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <h3>講者備註（原文依據）</h3>
+        <ul>
+          <li>Ada 提醒 quotation 文件要 include：course outline、trainer bio、available dates、terms of engagement。</li>
+          <li>問 Johnny 會唔會要中英雙語版本，方便客戶內部 circulate。Johnny 話最好有 bilingual，但優先係先出中文版本俾本地客戶睇，英文可以由中文再翻譯。</li>
+          <li>最後 10–15 分鐘大家整合下一步（分工見上表）。</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- 控制列 -->
+<div class="chrome">
+  <div class="progress" aria-hidden="true"><div class="progress__bar" id="bar"></div></div>
+  <div class="controls">
+    <button class="btn" id="prev" type="button" aria-label="上一頁">← 上一頁</button>
+    <span class="pager" id="pager" aria-hidden="true">1 <span>/ 13</span></span>
+    <button class="btn" id="next" type="button" aria-label="下一頁">下一頁 →</button>
+    <button class="btn btn--icon" id="overviewBtn" type="button" aria-label="開啟投影片總覽" title="投影片總覽">▦ 總覽</button>
+    <button class="btn btn--icon" id="notesBtn" type="button" aria-label="顯示或隱藏講者備註" aria-pressed="false" title="講者備註">✎ 備註</button>
+    <button class="btn btn--icon" id="themeBtn" type="button" aria-label="切換深色或淺色模式" title="切換主題">◐ 主題</button>
+    <button class="btn btn--icon" id="fsBtn" type="button" aria-label="進入或退出全螢幕" title="全螢幕">⛶ 全螢幕</button>
+    <button class="btn btn--icon" id="printBtn" type="button" aria-label="列印或匯出 PDF" title="列印／匯出 PDF">⎙ 列印</button>
+  </div>
+</div>
+
+<!-- 講者備註面板 -->
+<div class="notes-panel" id="notesPanel" role="region" aria-label="講者備註">
+  <h3 id="notesTitle">講者備註</h3>
+  <ul id="notesList"></ul>
+  <button class="btn notes-panel__close" id="notesClose" type="button">關閉備註</button>
+</div>
+
+<!-- 總覽 -->
+<div class="overview" id="overview" role="dialog" aria-modal="true" aria-label="投影片總覽">
+  <div class="overview__head">
+    <div>
+      <div class="kicker">投影片總覽</div>
+      <h2 style="margin:0">共 13 張，點選可跳至該頁</h2>
+    </div>
+    <button class="btn" id="overviewClose" type="button">關閉總覽</button>
+  </div>
+  <div class="overview__grid" id="thumbs"></div>
+</div>
+
+<p class="sr-only" id="live" role="status" aria-live="polite"></p>
+
+<script>
+(function(){
+  "use strict";
+
+  var slides   = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var total    = slides.length;
+  var current  = 0;
+
+  var bar      = document.getElementById("bar");
+  var pager    = document.getElementById("pager");
+  var prevBtn  = document.getElementById("prev");
+  var nextBtn  = document.getElementById("next");
+  var live     = document.getElementById("live");
+  var deck     = document.getElementById("deck");
+
+  var notesPanel = document.getElementById("notesPanel");
+  var notesList  = document.getElementById("notesList");
+  var notesTitle = document.getElementById("notesTitle");
+  var notesBtn   = document.getElementById("notesBtn");
+  var notesClose = document.getElementById("notesClose");
+
+  var overview   = document.getElementById("overview");
+  var thumbsWrap = document.getElementById("thumbs");
+  var overviewBtn= document.getElementById("overviewBtn");
+  var overviewClose = document.getElementById("overviewClose");
+
+  var themeBtn = document.getElementById("themeBtn");
+  var fsBtn    = document.getElementById("fsBtn");
+  var printBtn = document.getElementById("printBtn");
+
+  /* ---------- 導覽 ---------- */
+  function syncChrome(){
+    bar.style.width = ((current + 1) / total * 100) + "%";
+    pager.innerHTML = (current + 1) + ' <span>/ ' + total + "</span>";
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+    Array.prototype.forEach.call(thumbsWrap.children, function(el, i){
+      el.classList.toggle("is-current", i === current);
+      el.setAttribute("aria-current", i === current ? "true" : "false");
+    });
+  }
+  function show(index, announce){
+    index = Math.max(0, Math.min(total - 1, index));
+    if (index !== current || !slides[index].classList.contains("is-active")) {
+      slides[current].classList.remove("is-active");
+      current = index;
+      slides[current].classList.add("is-active");
+    }
+    syncChrome();
+
+    if (notesPanel.classList.contains("is-open")) renderNotes();
+    if (announce !== false) announcePage();
+  }
+  function announcePage(){
+    live.textContent = "第 " + (current + 1) + " 張，共 " + total + " 張：" + slides[current].dataset.title;
+  }
+  function next(){ show(current + 1); }
+  function prev(){ show(current - 1); }
+
+  prevBtn.addEventListener("click", prev);
+  nextBtn.addEventListener("click", next);
+
+  /* ---------- 鍵盤 ---------- */
+  document.addEventListener("keydown", function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if (overview.classList.contains("is-open")) {
+      if (k === "Escape") { closeOverview(); e.preventDefault(); }
+      return;
+    }
+    if (k === "ArrowRight" || k === "PageDown" || k === " " || k === "Enter" && document.activeElement === document.body) {
+      next(); e.preventDefault();
+    } else if (k === "ArrowLeft" || k === "PageUp") {
+      prev(); e.preventDefault();
+    } else if (k === "Home") {
+      show(0); e.preventDefault();
+    } else if (k === "End") {
+      show(total - 1); e.preventDefault();
+    } else if (k === "o" || k === "O") {
+      openOverview(); e.preventDefault();
+    } else if (k === "n" || k === "N") {
+      toggleNotes(); e.preventDefault();
+    } else if (k === "f" || k === "F") {
+      toggleFullscreen(); e.preventDefault();
+    } else if (k === "Escape") {
+      if (notesPanel.classList.contains("is-open")) { toggleNotes(false); e.preventDefault(); }
+    }
+  });
+
+  /* ---------- 講者備註 ---------- */
+  function renderNotes(){
+    var src = slides[current].querySelector(".notes");
+    notesList.innerHTML = "";
+    notesTitle.textContent = "講者備註（原文依據）｜第 " + (current + 1) + " 張";
+    if (!src) {
+      var li0 = document.createElement("li");
+      li0.textContent = "本頁沒有額外備註。";
+      notesList.appendChild(li0);
+      return;
+    }
+    Array.prototype.forEach.call(src.querySelectorAll("li"), function(li){
+      var n = document.createElement("li");
+      n.textContent = li.textContent;   // textContent：安全編碼
+      notesList.appendChild(n);
+    });
+  }
+  function toggleNotes(force){
+    var open = typeof force === "boolean" ? force : !notesPanel.classList.contains("is-open");
+    notesPanel.classList.toggle("is-open", open);
+    notesBtn.setAttribute("aria-pressed", open ? "true" : "false");
+    if (open) { renderNotes(); notesClose.focus(); }
+  }
+  notesBtn.addEventListener("click", function(){ toggleNotes(); });
+  notesClose.addEventListener("click", function(){ toggleNotes(false); });
+
+  /* ---------- 總覽 ---------- */
+  function buildThumbs(){
+    slides.forEach(function(s, i){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "thumb";
+      var n = document.createElement("span");
+      n.className = "thumb__n";
+      n.textContent = "第 " + (i + 1) + " 張";
+      var t = document.createElement("span");
+      t.className = "thumb__t";
+      t.textContent = s.dataset.title || ("投影片 " + (i + 1));
+      b.appendChild(n); b.appendChild(t);
+      b.addEventListener("click", function(){ show(i); closeOverview(); });
+      thumbsWrap.appendChild(b);
+    });
+  }
+  function openOverview(){
+    overview.classList.add("is-open");
+    var cur = thumbsWrap.children[current];
+    if (cur) cur.focus();
+  }
+  function closeOverview(){
+    overview.classList.remove("is-open");
+    overviewBtn.focus();
+  }
+  overviewBtn.addEventListener("click", openOverview);
+  overviewClose.addEventListener("click", closeOverview);
+
+  /* ---------- 全螢幕 ---------- */
+  function toggleFullscreen(){
+    if (!document.fullscreenElement) {
+      var el = document.documentElement;
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (req) { var p = req.call(el); if (p && p.catch) p.catch(function(){}); }
+    } else {
+      var exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) exit.call(document);
+    }
+  }
+  fsBtn.addEventListener("click", toggleFullscreen);
+  document.addEventListener("fullscreenchange", function(){
+    fsBtn.textContent = document.fullscreenElement ? "⛶ 退出全螢幕" : "⛶ 全螢幕";
+  });
+
+  /* ---------- 主題 ---------- */
+  var THEME_KEY = "deck.theme";
+  try {
+    var saved = localStorage.getItem(THEME_KEY);
+    if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+  } catch(e){}
+  themeBtn.addEventListener("click", function(){
+    var isDark = document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var nextTheme = isDark ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    try { localStorage.setItem(THEME_KEY, nextTheme); } catch(e){}
+    live.textContent = "已切換為" + (nextTheme === "dark" ? "深色" : "淺色") + "模式";
+  });
+
+  /* ---------- 列印 ---------- */
+  printBtn.addEventListener("click", function(){ window.print(); });
+
+  /* ---------- 觸控滑動 ---------- */
+  var x0 = null;
+  deck.addEventListener("touchstart", function(e){ x0 = e.changedTouches[0].clientX; }, {passive:true});
+  deck.addEventListener("touchend", function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 55) { dx < 0 ? next() : prev(); }
+    x0 = null;
+  }, {passive:true});
+
+  /* ---------- 初始化 ---------- */
+  buildThumbs();
+  slides[0].classList.add("is-active");
+  show(0, false);
+  bar.style.width = (1 / total * 100) + "%";
+})();
+</script>
+</body>
+</html>

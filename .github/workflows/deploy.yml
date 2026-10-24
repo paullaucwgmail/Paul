@@ -37,14 +37,22 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf dist
-          mkdir -p dist
+          mkdir -p dist/deck
           cp index.html dist/index.html
-          # Fail the build early if the artefact is broken or empty.
-          test -s dist/index.html
-          grep -qi "<html" dist/index.html
-          grep -qi "</html>" dist/index.html
+          cp deck/index.html dist/deck/index.html
+          # Fail the build early if any page is broken or empty.
+          for page in dist/index.html dist/deck/index.html; do
+            test -s "$page"
+            grep -qi "<html" "$page"
+            grep -qi "</html>" "$page"
+            echo "OK  $page — $(wc -c < "$page") bytes"
+          done
+          # Refuse to ship a page that pulls in external resources.
+          if grep -Eqi '(src|href)="(https?:)?//' dist/index.html dist/deck/index.html; then
+            echo "::error::An external resource reference was found; pages must be self-contained."
+            exit 1
+          fi
           touch dist/.nojekyll
-          echo "Built dist/ — $(wc -c < dist/index.html) bytes"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
