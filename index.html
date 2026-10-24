@@ -4,492 +4,418 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>專案導覽｜Paul 的 Web App 專案</title>
+<title>待辦清單 · Todo</title>
 <style>
-  :root{
-    --bg:#f3f5fa; --panel:#ffffff; --panel-2:#f8fafc; --ink:#0d1526; --ink-2:#3b4759;
-    --muted:#68758a; --line:#e2e8f2; --accent:#1b4fd8; --soft:#eaefff;
-    --live:#0f7a4d; --live-soft:#e6f6ee; --wip:#a86400; --wip-soft:#fdf4e3;
-    --ring:rgba(27,79,216,.35);
-    --shadow:0 1px 2px rgba(13,21,38,.05), 0 16px 36px -22px rgba(13,21,38,.38);
-    --r:18px; --r-sm:10px;
-    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
-    --t:180ms cubic-bezier(.2,.7,.3,1);
-    --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  /* ---------- Design tokens ---------- */
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #f2f4f7;
+    --text: #16181d;
+    --text-muted: #6b7280;
+    --border: #e4e7ec;
+    --accent: #4f46e5;
+    --accent-soft: #eef0ff;
+    --danger: #d92d20;
+    --danger-soft: #fef3f2;
+    --ring: rgba(79, 70, 229, .35);
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 12px 32px -12px rgba(16, 24, 40, .18);
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --radius-sm: 9px;
+    --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
+    --space-4: 16px; --space-5: 24px; --space-6: 32px;
+    --t: 180ms cubic-bezier(.2, .7, .3, 1);
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+            "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
   }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#070b14; --panel:#0f1626; --panel-2:#131c2e; --ink:#eef2f9; --ink-2:#c3cddd;
-      --muted:#8f9cb2; --line:#22304a; --accent:#8fb0ff; --soft:#17224a;
-      --live:#4ade80; --live-soft:#0d2a1e; --wip:#fbbf24; --wip-soft:#2a2213;
-      --ring:rgba(143,176,255,.4);
-      --shadow:0 1px 2px rgba(0,0,0,.4), 0 20px 44px -24px rgba(0,0,0,.85);
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --surface: #171a21;
+      --surface-2: #1e222b;
+      --text: #e9ecf1;
+      --text-muted: #9aa3b2;
+      --border: #2a2f3a;
+      --accent: #8b83ff;
+      --accent-soft: #23213a;
+      --danger: #ff6b5e;
+      --danger-soft: #2b1a19;
+      --ring: rgba(139, 131, 255, .4);
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -18px rgba(0, 0, 0, .7);
     }
   }
-  :root[data-theme="light"]{
-    --bg:#f3f5fa; --panel:#fff; --panel-2:#f8fafc; --ink:#0d1526; --ink-2:#3b4759;
-    --muted:#68758a; --line:#e2e8f2; --accent:#1b4fd8; --soft:#eaefff;
-    --live:#0f7a4d; --live-soft:#e6f6ee; --wip:#a86400; --wip-soft:#fdf4e3;
-    --ring:rgba(27,79,216,.35);
+  /* manual override (set by the theme button, stored in localStorage) */
+  :root[data-theme="light"] {
+    --bg:#f6f7f9; --surface:#fff; --surface-2:#f2f4f7; --text:#16181d;
+    --text-muted:#6b7280; --border:#e4e7ec; --accent:#4f46e5; --accent-soft:#eef0ff;
+    --danger:#d92d20; --danger-soft:#fef3f2; --ring:rgba(79,70,229,.35);
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 12px 32px -12px rgba(16,24,40,.18);
   }
-  :root[data-theme="dark"]{
-    --bg:#070b14; --panel:#0f1626; --panel-2:#131c2e; --ink:#eef2f9; --ink-2:#c3cddd;
-    --muted:#8f9cb2; --line:#22304a; --accent:#8fb0ff; --soft:#17224a;
-    --live:#4ade80; --live-soft:#0d2a1e; --wip:#fbbf24; --wip-soft:#2a2213;
-    --ring:rgba(143,176,255,.4);
+  :root[data-theme="dark"] {
+    --bg:#0f1115; --surface:#171a21; --surface-2:#1e222b; --text:#e9ecf1;
+    --text-muted:#9aa3b2; --border:#2a2f3a; --accent:#8b83ff; --accent-soft:#23213a;
+    --danger:#ff6b5e; --danger-soft:#2b1a19; --ring:rgba(139,131,255,.4);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 18px 40px -18px rgba(0,0,0,.7);
   }
 
-  *,*::before,*::after{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.6;
-       -webkit-font-smoothing:antialiased}
-  .wrap{max-width:1240px;margin:0 auto;padding:var(--s6) var(--s4) var(--s7)}
-  h1,h2,h3{margin:0;line-height:1.3;letter-spacing:-.01em}
-  h1{font-size:clamp(22px,3vw,34px)}
-  h2{font-size:clamp(16px,1.7vw,20px)}
-  h3{font-size:clamp(15px,1.5vw,18px)}
-  p{margin:0 0 var(--s3);color:var(--ink-2)}
-  .muted{color:var(--muted)}
-  .small{font-size:clamp(11.5px,1.05vw,13px)}
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
-           clip:rect(0 0 0 0);white-space:nowrap;border:0}
-  :focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
-
-  /* 頁首 */
-  header.top{margin-bottom:var(--s5)}
-  .meta{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s3)}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);
-        border-radius:999px;padding:5px 13px;font-size:clamp(11.5px,1.05vw,13px);color:var(--ink-2)}
-  .chip b{color:var(--ink);font-weight:700}
-  .toprow{display:flex;gap:var(--s4);align-items:flex-start;flex-wrap:wrap}
-  .grow{flex:1 1 auto}
-
-  /* 控制列 */
-  .controls{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
-            box-shadow:var(--shadow);padding:var(--s4) var(--s5);margin-bottom:var(--s5);
-            display:flex;flex-direction:column;gap:var(--s4)}
-  .row{display:flex;gap:var(--s4);flex-wrap:wrap;align-items:flex-start}
-  .group{display:flex;flex-direction:column;gap:var(--s2);min-width:0}
-  .group__label{font-size:clamp(11.5px,1.05vw,13px);font-weight:700;color:var(--muted);letter-spacing:.03em}
-  .opts{display:flex;gap:var(--s2);flex-wrap:wrap}
-  .opt{position:relative}
-  .opt input{position:absolute;opacity:0;width:0;height:0}
-  .opt span{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel-2);
-            border-radius:999px;padding:6px 14px;cursor:pointer;font-size:clamp(12px,1.1vw,13.5px);
-            transition:background var(--t),border-color var(--t),color var(--t)}
-  .opt span:hover{border-color:var(--accent)}
-  .opt input:checked + span{background:var(--accent);border-color:var(--accent);color:#fff}
-  .opt input:focus-visible + span{outline:3px solid var(--accent);outline-offset:2px}
-  input[type="search"],select{
-    font:inherit;font-size:clamp(12.5px,1.15vw,14px);padding:9px 13px;border-radius:var(--r-sm);
-    border:1px solid var(--line);background:var(--panel-2);color:var(--ink)}
-  input[type="search"]{min-width:min(340px,100%)}
-  input[type="search"]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--ring);outline:none}
-  .btn{appearance:none;cursor:pointer;font:inherit;font-size:clamp(12px,1.1vw,13.5px);font-weight:600;
-       background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-sm);
-       padding:9px 14px;transition:background var(--t),border-color var(--t),transform var(--t),color var(--t)}
-  .btn:hover{background:var(--soft);border-color:var(--accent);color:var(--accent)}
-  .btn:active{transform:scale(.97)}
-  .status{font-size:clamp(12px,1.1vw,13.5px);color:var(--muted)}
-  .status b{color:var(--ink)}
-
-  /* 卡片 */
-  .cards{display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
-        padding:var(--s5);display:flex;flex-direction:column;gap:var(--s3);
-        transition:transform var(--t),border-color var(--t)}
-  .card:hover{transform:translateY(-2px);border-color:var(--accent)}
-  .card__top{display:flex;align-items:flex-start;gap:var(--s3);flex-wrap:wrap}
-  .card__title{flex:1 1 auto;min-width:0}
-  .card__desc{margin:0;color:var(--ink-2);font-size:clamp(12.5px,1.15vw,14.5px)}
-  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 11px;
-         font-size:clamp(11px,1vw,12.5px);font-weight:700;white-space:nowrap}
-  .badge--live{background:var(--live-soft);color:var(--live)}
-  .badge--wip{background:var(--wip-soft);color:var(--wip)}
-  .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-  .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:clamp(11px,1vw,12.5px);
-       font-weight:600;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2)}
-  .tags{display:flex;gap:var(--s2);flex-wrap:wrap}
-  .stack{display:flex;gap:6px;flex-wrap:wrap}
-  .stack .tag{background:var(--soft);border-color:transparent;color:var(--accent)}
-  .card ul.hl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-  .card ul.hl li{position:relative;padding-left:var(--s4);font-size:clamp(12px,1.1vw,13.5px);color:var(--ink-2)}
-  .card ul.hl li::before{content:"";position:absolute;left:4px;top:.62em;width:6px;height:6px;
-                         border-radius:50%;background:var(--accent)}
-  .card__foot{margin-top:auto;display:flex;align-items:center;gap:var(--s3);flex-wrap:wrap;
-              padding-top:var(--s3);border-top:1px solid var(--line)}
-  .open{appearance:none;cursor:pointer;text-decoration:none;font-weight:700;
-        font-size:clamp(12.5px,1.15vw,14px);padding:9px 16px;border-radius:var(--r-sm);
-        background:var(--accent);color:#fff;border:1px solid var(--accent);
-        display:inline-flex;align-items:center;gap:8px;transition:filter var(--t),transform var(--t)}
-  .open:hover{filter:brightness(1.08)}
-  .open:active{transform:scale(.98)}
-
-  .empty{background:var(--panel);border:1px dashed var(--line);border-radius:var(--r);
-         padding:var(--s7) var(--s5);text-align:center;color:var(--muted)}
-
-  /* 頁尾 */
-  .howto{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
-         padding:var(--s5);margin-top:var(--s6)}
-  .howto code{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;
-              font-size:.95em}
-  pre{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s4);
-      overflow:auto;font-size:clamp(11.5px,1.05vw,13px);margin:var(--s3) 0 0}
-  footer.foot{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--line);
-              color:var(--muted);font-size:clamp(11.5px,1.05vw,13px)}
-
-  @page{size:A4;margin:12mm}
-  @media print{
-    :root{--bg:#fff;--panel:#fff;--panel-2:#fff;--ink:#000;--ink-2:#222;--muted:#555;--line:#bbb;--shadow:none}
-    body{background:#fff}
-    .controls,.open{display:none}
-    .card,.howto{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
-    .cards{grid-template-columns:1fr 1fr}
-    a{color:#000}
-    h1{font-size:18pt} h2{font-size:13pt}
+  /* ---------- Base ---------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    padding: var(--space-6) var(--space-4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
-  @media (prefers-reduced-motion: reduce){
-    *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  /* ---------- Card ---------- */
+  .app {
+    width: 100%;
+    max-width: 560px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  header.app__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-3);
+  }
+  .app__title { margin: 0; font-size: 1.25rem; font-weight: 650; letter-spacing: -.01em; }
+  .app__sub { margin: 2px 0 0; font-size: .8125rem; color: var(--text-muted); }
+  .grow { flex: 1 1 auto; }
+  .icon-btn {
+    appearance: none; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-muted); width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center; cursor: pointer;
+    transition: background var(--t), color var(--t), border-color var(--t), transform var(--t);
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+  .icon-btn:active { transform: scale(.96); }
+
+  /* ---------- Composer ---------- */
+  form.composer {
+    display: flex; gap: var(--space-2);
+    padding: var(--space-2) var(--space-5) var(--space-4);
+  }
+  .composer__field { position: relative; flex: 1 1 auto; }
+  .composer input[type="text"] {
+    width: 100%;
+    padding: 13px var(--space-4);
+    font: inherit;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    transition: border-color var(--t), background var(--t), box-shadow var(--t);
+  }
+  .composer input[type="text"]::placeholder { color: var(--text-muted); }
+  .composer input[type="text"]:focus {
+    outline: none; background: var(--surface);
+    border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring);
+  }
+  .btn-primary {
+    appearance: none; border: 1px solid transparent; cursor: pointer;
+    font: inherit; font-weight: 600;
+    padding: 13px 20px; border-radius: var(--radius-md);
+    color: #fff; background: var(--accent);
+    transition: filter var(--t), transform var(--t), box-shadow var(--t);
+    white-space: nowrap;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary:active { transform: scale(.98); }
+
+  /* ---------- List ---------- */
+  ul.tasks { list-style: none; margin: 0; padding: 0 var(--space-3) var(--space-2); }
+  li.task {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    transition: background var(--t), opacity var(--t), transform var(--t);
+    animation: enter var(--t) both;
+  }
+  li.task + li.task { border-top: 1px solid var(--border); border-radius: var(--radius-md); }
+  li.task:hover { background: var(--surface-2); }
+  @keyframes enter { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  li.task.leaving { opacity: 0; transform: translateX(12px); }
+
+  .check { flex: 0 0 auto; position: relative; width: 22px; height: 22px; }
+  .check input {
+    appearance: none; -webkit-appearance: none;
+    width: 22px; height: 22px; margin: 0; cursor: pointer;
+    border: 1.5px solid var(--border); border-radius: 7px;
+    background: var(--surface);
+    transition: background var(--t), border-color var(--t), transform var(--t);
+  }
+  .check input:hover { border-color: var(--accent); }
+  .check input:checked { background: var(--accent); border-color: var(--accent); }
+  .check input:checked::after {
+    content: ""; position: absolute; inset: 0;
+    background: no-repeat center/13px 13px
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  }
+  .check input:active { transform: scale(.92); }
+
+  .task__text {
+    flex: 1 1 auto; min-width: 0; cursor: pointer;
+    overflow-wrap: anywhere;
+    transition: color var(--t);
+  }
+  li.task.is-done .task__text { color: var(--text-muted); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
+  .del {
+    flex: 0 0 auto; appearance: none; cursor: pointer;
+    border: 1px solid transparent; background: transparent; color: var(--text-muted);
+    width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+    opacity: 0; transition: opacity var(--t), background var(--t), color var(--t);
+  }
+  li.task:hover .del, .del:focus-visible { opacity: 1; }
+  .del:hover { background: var(--danger-soft); color: var(--danger); }
+  @media (hover: none) { .del { opacity: 1; } }   /* touch devices: always visible */
+
+  /* ---------- Empty state ---------- */
+  .empty { padding: var(--space-6) var(--space-5); text-align: center; color: var(--text-muted); }
+  .empty svg { opacity: .5; margin-bottom: var(--space-3); }
+  .empty p { margin: 0; font-size: .9375rem; }
+
+  /* ---------- Footer ---------- */
+  footer.app__foot {
+    display: flex; align-items: center; gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    font-size: .8125rem; color: var(--text-muted);
+  }
+  .link-btn {
+    appearance: none; border: 0; background: none; cursor: pointer;
+    font: inherit; color: var(--accent); padding: 4px 6px; border-radius: 6px;
+    transition: background var(--t);
+  }
+  .link-btn:hover { background: var(--accent-soft); }
+  .link-btn[disabled] { color: var(--text-muted); cursor: default; opacity: .55; }
+
+  @media (max-width: 480px) {
+    body { padding: var(--space-4) var(--space-2); }
+    header.app__head, form.composer, footer.app__foot { padding-left: var(--space-4); padding-right: var(--space-4); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
-    <div class="toprow">
-      <div class="grow">
-        <h1 id="siteTitle">專案導覽</h1>
-        <p id="siteSubtitle" style="margin-top:8px">所有已部署的網頁專案集中在此。</p>
-        <div class="meta">
-          <span class="chip">專案總數：<b id="cTotal">0</b></span>
-          <span class="chip">已上線：<b id="cLive">0</b></span>
-          <span class="chip">開發中：<b id="cWip">0</b></span>
-          <span class="chip">最後更新：<b id="cUpdated">—</b></span>
-          <span class="chip" id="cSource">資料來源：載入中…</span>
-        </div>
-      </div>
-      <div class="row" style="flex:0 0 auto">
-        <button class="btn" id="themeBtn" type="button" aria-label="切換深色或淺色模式">◐ 主題</button>
-        <button class="btn" id="printBtn" type="button" aria-label="列印或匯出 PDF">⎙ 列印／PDF</button>
-      </div>
+<main class="app" aria-labelledby="app-title">
+  <header class="app__head">
+    <div class="grow">
+      <h1 class="app__title" id="app-title">待辦清單</h1>
+      <p class="app__sub" id="app-sub">輸入後按 Enter 或「新增」</p>
     </div>
+    <button class="icon-btn" id="theme" type="button" aria-label="切換深色／淺色主題" title="切換主題">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+      </svg>
+    </button>
   </header>
 
-  <section class="controls" aria-labelledby="ctrl-h">
-    <h2 id="ctrl-h" class="sr-only">搜尋與篩選</h2>
-    <div class="row">
-      <div class="group grow">
-        <label class="group__label" for="q">搜尋專案（名稱、簡介、技術、亮點）</label>
-        <input type="search" id="q" placeholder="例如 儀表板、SVG、localStorage" autocomplete="off">
-      </div>
-      <div class="group">
-        <label class="group__label" for="sort">排序</label>
-        <select id="sort">
-          <option value="updated">更新日期（新 → 舊）</option>
-          <option value="name">名稱（A → Z）</option>
-          <option value="status">狀態（已上線優先）</option>
-        </select>
-      </div>
+  <form class="composer" id="form" autocomplete="off">
+    <div class="composer__field">
+      <label class="sr-only" for="input">新增待辦事項</label>
+      <input id="input" name="task" type="text" placeholder="要做什麼？" maxlength="200"
+             aria-describedby="app-sub" required>
     </div>
-    <div class="row">
-      <div class="group">
-        <span class="group__label" id="lbl-cat">分類</span>
-        <div class="opts" id="f-cat" role="group" aria-labelledby="lbl-cat"></div>
-      </div>
-      <div class="group">
-        <span class="group__label" id="lbl-status">狀態</span>
-        <div class="opts" id="f-status" role="group" aria-labelledby="lbl-status"></div>
-      </div>
-      <div class="group" style="align-self:flex-end">
-        <button class="btn" id="resetBtn" type="button">重設全部</button>
-      </div>
-    </div>
-    <p class="status" id="filterStatus" role="status" aria-live="polite"></p>
-  </section>
+    <button class="btn-primary" type="submit">新增</button>
+  </form>
 
-  <section aria-labelledby="cards-h">
-    <h2 id="cards-h" class="sr-only">專案清單</h2>
-    <div class="cards" id="cards"></div>
-    <div class="empty" id="empty" hidden>沒有符合條件的專案。請調整搜尋關鍵字或重設篩選。</div>
-  </section>
+  <ul class="tasks" id="list"></ul>
 
-  <section class="howto" aria-labelledby="howto-h">
-    <h2 id="howto-h">如何新增專案</h2>
-    <p>本頁面所有內容都來自同一個資料檔 <a href="projects.json"><code>projects.json</code></a>；新增或修改專案只需編輯該檔，不需要改動本頁程式碼。</p>
-    <p class="small muted">欄位說明：<code>name</code> 專案名稱、<code>description</code> 簡介、<code>stack</code> 技術堆疊（陣列）、
-      <code>status</code> 狀態（<code>已上線</code> 或 <code>開發中</code>）、<code>category</code> 分類、<code>url</code> 連結（相對路徑）、
-      <code>updated</code> 更新日期（YYYY-MM-DD）、<code>highlights</code> 亮點（陣列，可省略）。</p>
-    <pre>{
-  "id": "new-project",
-  "name": "新專案名稱",
-  "description": "一句話簡介。",
-  "stack": ["HTML", "CSS", "JavaScript"],
-  "status": "開發中",
-  "category": "工具",
-  "url": "new-project/",
-  "updated": "2026-10-24",
-  "highlights": ["重點一", "重點二"]
-}</pre>
-    <p class="small muted" style="margin-top:var(--s3)">分類清單可於 <code>categories</code> 欄位自訂；若未提供，會自動由各專案的 <code>category</code> 彙整。</p>
-  </section>
+  <div class="empty" id="empty" hidden>
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+    <p>還沒有待辦事項——加一項開始吧。</p>
+  </div>
 
-  <footer class="foot">
-    本頁為單一 HTML 檔，執行時讀取同目錄的 <code>projects.json</code>；若以本機檔案方式開啟（file://）而無法讀取，
-    會改用內嵌於本頁的備份清單，並在頁首標示資料來源。
+  <footer class="app__foot">
+    <span class="grow" id="count">0 項未完成</span>
+    <button class="link-btn" id="clear" type="button" disabled>清除已完成</button>
   </footer>
-</div>
+</main>
 
 <p class="sr-only" id="live" role="status" aria-live="polite"></p>
 
 <script>
-(function(){
+(function () {
   "use strict";
 
-  /* 內嵌備份：與 projects.json 內容相同，於 file:// 或讀取失敗時使用 */
-  var FALLBACK = {"siteTitle":"Paul 的 Web App 專案導覽","siteSubtitle":"所有已部署的網頁專案集中在此；新增專案只需編輯本檔（projects.json）。","updated":"2026-10-24","categories":["工具","簡報","數據分析"],"statuses":["已上線","開發中"],"projects":[{"id":"todo","name":"待辦清單 Todo List","description":"可新增、標記完成與刪除的待辦清單，資料存於瀏覽器本機，關掉再開仍在。","stack":["HTML","CSS","JavaScript","localStorage"],"status":"已上線","category":"工具","url":"todo/","updated":"2026-10-24","highlights":["新增／標記完成／刪除三項基本功能","深淺色主題，跟隨系統並可手動切換","完整鍵盤操作與螢幕閱讀器標籤"]},{"id":"deck","name":"會議紀錄簡報：AI 課程與 OpenClaw","description":"由一小時會議原始記錄整理而成的 13 張繁體中文簡報，含講者備註、總覽與列印模式。","stack":["HTML","CSS","JavaScript","內嵌 SVG","列印樣式"],"status":"已上線","category":"簡報","url":"deck/","updated":"2026-10-24","highlights":["方向鍵／Page Up／Page Down／Home／End 導覽","投影片總覽、講者備註、全螢幕","列印時每張投影片獨立成頁"]},{"id":"dashboard","name":"銷售數據儀表板","description":"以 SalesData 工作表 99 筆訂單（2018–2020）建立的互動儀表板，含 KPI、四張圖表、篩選與可排序明細表。","stack":["HTML","CSS","JavaScript","內嵌 SVG 圖表","無依賴"],"status":"已上線","category":"數據分析","url":"dashboard/","updated":"2026-10-24","highlights":["KPI：總收入 9,890,000、毛利率 32.79%","地區／產品／年份篩選與即時搜尋","圖表附滑鼠提示與無障礙資料表"]}]};
+  var STORE_KEY = "todo.v1";
+  var THEME_KEY = "todo.theme";
 
-  var el = function(id){ return document.getElementById(id); };
-  var live = el("live");
+  var form  = document.getElementById("form");
+  var input = document.getElementById("input");
+  var list  = document.getElementById("list");
+  var empty = document.getElementById("empty");
+  var count = document.getElementById("count");
+  var clear = document.getElementById("clear");
+  var live  = document.getElementById("live");
+  var themeBtn = document.getElementById("theme");
 
-  var state = { q: "", cat: [], status: [], sort: "updated" };
-  var DATA = { projects: [], categories: [], statuses: ["已上線","開發中"] };
-  var source = "";
+  /* ---------- state ---------- */
+  var tasks = load();
 
-  /* ---------- 載入資料 ---------- */
-  function normalise(raw){
-    var projects = Array.isArray(raw.projects) ? raw.projects.slice() : [];
-    projects = projects.filter(function(p){
-      return p && typeof p.name === "string" && p.name.trim() !== "";
-    }).map(function(p){
-      return {
-        id: String(p.id || p.name),
-        name: p.name,
-        description: typeof p.description === "string" ? p.description : "",
-        stack: Array.isArray(p.stack) ? p.stack.filter(function(s){ return typeof s === "string"; }) : [],
-        status: (p.status === "開發中" || p.status === "已上線") ? p.status : "開發中",
-        category: typeof p.category === "string" && p.category.trim() ? p.category : "未分類",
-        url: typeof p.url === "string" ? p.url : "",
-        updated: typeof p.updated === "string" ? p.updated : "",
-        highlights: Array.isArray(p.highlights) ? p.highlights.filter(function(h){ return typeof h === "string"; }) : []
-      };
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      var data = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(data)) return [];
+      return data.filter(function (t) {
+        return t && typeof t.text === "string";
+      }).map(function (t) {
+        return { id: String(t.id || uid()), text: t.text, done: !!t.done };
+      });
+    } catch (e) { return []; }
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(tasks)); } catch (e) {}
+  }
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+  function announce(msg) { live.textContent = msg; }
+
+  /* ---------- render ---------- */
+  function render() {
+    list.textContent = "";
+
+    tasks.forEach(function (task) {
+      var li = document.createElement("li");
+      li.className = "task" + (task.done ? " is-done" : "");
+      li.dataset.id = task.id;
+
+      var box = document.createElement("span");
+      box.className = "check";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = task.done;
+      cb.id = "cb-" + task.id;
+      cb.setAttribute("aria-label", "標記為" + (task.done ? "未完成" : "已完成") + "：" + task.text);
+      cb.addEventListener("change", function () { toggle(task.id); });
+      box.appendChild(cb);
+
+      var label = document.createElement("label");
+      label.className = "task__text";
+      label.htmlFor = cb.id;
+      label.textContent = task.text;          // textContent → no HTML injection
+
+      var del = document.createElement("button");
+      del.type = "button";
+      del.className = "del";
+      del.setAttribute("aria-label", "刪除：" + task.text);
+      del.title = "刪除";
+      del.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" ' +
+        'stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+        '<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+      del.addEventListener("click", function () { remove(task.id, li); });
+
+      li.appendChild(box);
+      li.appendChild(label);
+      li.appendChild(del);
+      list.appendChild(li);
     });
-    var cats = Array.isArray(raw.categories) && raw.categories.length
-      ? raw.categories.filter(function(c){ return typeof c === "string"; })
-      : projects.map(function(p){ return p.category; }).filter(function(c, i, a){ return a.indexOf(c) === i; });
-    return { projects: projects, categories: cats, statuses: ["已上線", "開發中"] };
+
+    var left = tasks.filter(function (t) { return !t.done; }).length;
+    var done = tasks.length - left;
+    count.textContent = left + " 項未完成" + (done ? "（" + done + " 項已完成）" : "");
+    empty.hidden = tasks.length !== 0;
+    clear.disabled = done === 0;
+    save();
   }
 
-  function apply(raw, srcLabel, meta){
-    DATA = normalise(raw);
-    source = srcLabel;
-    el("siteTitle").textContent = (raw.siteTitle || "專案導覽");
-    el("siteSubtitle").textContent = (raw.siteSubtitle || "所有已部署的網頁專案集中在此。");
-    el("cUpdated").textContent = raw.updated || "—";
-    el("cSource").textContent = "資料來源：" + srcLabel;
-    document.title = (raw.siteTitle || "專案導覽") + "｜專案導覽";
-    buildChips();
+  /* ---------- actions ---------- */
+  function add(text) {
+    tasks.unshift({ id: uid(), text: text, done: false });
     render();
-    if (meta) live.textContent = meta;
+    announce("已新增：" + text);
   }
-
-  function load(){
-    if (typeof fetch !== "function") { apply(FALLBACK, "內嵌備份", null); return; }
-    fetch("projects.json", { cache: "no-store" })
-      .then(function(r){
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
-      .then(function(raw){
-        if (!raw || !Array.isArray(raw.projects)) throw new Error("格式不符");
-        apply(raw, "projects.json", "已載入 " + raw.projects.length + " 個專案");
-      })
-      .catch(function(){
-        apply(FALLBACK, "內嵌備份（無法讀取 projects.json）", "已改用內嵌備份清單");
-      });
-  }
-
-  /* ---------- 篩選選項 ---------- */
-  function buildChips(){
-    [["f-cat","cat",DATA.categories],["f-status","status",DATA.statuses]].forEach(function(spec){
-      var wrap = el(spec[0]); wrap.textContent = "";
-      var key = spec[1];
-      var all = document.createElement("label");
-      all.className = "opt";
-      var cbAll = document.createElement("input");
-      cbAll.type = "checkbox"; cbAll.checked = true; cbAll.value = "__all__";
-      cbAll.addEventListener("change", function(){
-        if (cbAll.checked) { state[key] = []; }
-        Array.prototype.forEach.call(wrap.querySelectorAll("input[value]:not([value='__all__'])"), function(c){ c.checked = false; });
-        render();
-      });
-      var spAll = document.createElement("span"); spAll.textContent = "全部";
-      all.appendChild(cbAll); all.appendChild(spAll); wrap.appendChild(all);
-
-      spec[2].forEach(function(v){
-        var l = document.createElement("label"); l.className = "opt";
-        var cb = document.createElement("input"); cb.type = "checkbox"; cb.value = v;
-        cb.addEventListener("change", function(){
-          var list = state[key], i = list.indexOf(v);
-          if (cb.checked && i < 0) list.push(v);
-          if (!cb.checked && i >= 0) list.splice(i, 1);
-          cbAll.checked = list.length === 0;
-          render();
-        });
-        var s = document.createElement("span");
-        s.textContent = v + " ";
-        var sm = document.createElement("small");
-        sm.textContent = "(" + DATA.projects.filter(function(p){ return p[key] === v; }).length + ")";
-        s.appendChild(sm);
-        l.appendChild(cb); l.appendChild(s); wrap.appendChild(l);
-      });
-    });
-  }
-
-  /* ---------- 篩選與排序 ---------- */
-  function matches(p){
-    if (state.cat.length && state.cat.indexOf(p.category) < 0) return false;
-    if (state.status.length && state.status.indexOf(p.status) < 0) return false;
-    if (state.q) {
-      var q = state.q.toLowerCase();
-      var hay = [p.name, p.description, p.category, p.status, p.stack.join(" "), p.highlights.join(" ")].join(" ").toLowerCase();
-      if (hay.indexOf(q) < 0) return false;
-    }
-    return true;
-  }
-  function sortRows(rows){
-    return rows.slice().sort(function(a, b){
-      if (state.sort === "name") return a.name.localeCompare(b.name, "zh-Hant");
-      if (state.sort === "status") {
-        var rank = { "已上線": 0, "開發中": 1 };
-        var d = (rank[a.status] || 9) - (rank[b.status] || 9);
-        return d !== 0 ? d : a.name.localeCompare(b.name, "zh-Hant");
+  function toggle(id) {
+    tasks = tasks.map(function (t) {
+      if (t.id === id) {
+        var next = { id: t.id, text: t.text, done: !t.done };
+        announce((next.done ? "已完成：" : "改回未完成：") + next.text);
+        return next;
       }
-      return String(b.updated).localeCompare(String(a.updated)) || a.name.localeCompare(b.name, "zh-Hant");
-    });
-  }
-
-  /* ---------- 卡片 ---------- */
-  function badge(status){
-    var s = document.createElement("span");
-    s.className = "badge " + (status === "已上線" ? "badge--live" : "badge--wip");
-    s.textContent = status;
-    return s;
-  }
-  function tag(text, cls){
-    var s = document.createElement("span");
-    s.className = "tag" + (cls ? " " + cls : "");
-    s.textContent = text;
-    return s;
-  }
-  function card(p){
-    var c = document.createElement("article");
-    c.className = "card";
-
-    var top = document.createElement("div"); top.className = "card__top";
-    var t = document.createElement("div"); t.className = "card__title";
-    var h = document.createElement("h3"); h.textContent = p.name;
-    t.appendChild(h);
-    top.appendChild(t);
-    top.appendChild(badge(p.status));
-    c.appendChild(top);
-
-    var tags = document.createElement("div"); tags.className = "tags";
-    tags.appendChild(tag(p.category));
-    if (p.updated) tags.appendChild(tag("更新：" + p.updated));
-    c.appendChild(tags);
-
-    var d = document.createElement("p"); d.className = "card__desc"; d.textContent = p.description;
-    c.appendChild(d);
-
-    if (p.stack.length) {
-      var lab = document.createElement("div"); lab.className = "group__label"; lab.textContent = "技術堆疊";
-      c.appendChild(lab);
-      var st = document.createElement("div"); st.className = "stack";
-      p.stack.forEach(function(s){ st.appendChild(tag(s)); });
-      c.appendChild(st);
-    }
-
-    if (p.highlights.length) {
-      var lab2 = document.createElement("div"); lab2.className = "group__label"; lab2.textContent = "重點功能";
-      c.appendChild(lab2);
-      var ul = document.createElement("ul"); ul.className = "hl";
-      p.highlights.forEach(function(x){ var li = document.createElement("li"); li.textContent = x; ul.appendChild(li); });
-      c.appendChild(ul);
-    }
-
-    var foot = document.createElement("div"); foot.className = "card__foot";
-    if (p.url) {
-      var a = document.createElement("a");
-      a.className = "open"; a.href = p.url;
-      a.textContent = "開啟專案 →";
-      a.setAttribute("aria-label", "開啟專案：" + p.name);
-      foot.appendChild(a);
-    } else {
-      var span = document.createElement("span");
-      span.className = "small muted"; span.textContent = "尚未提供連結";
-      foot.appendChild(span);
-    }
-    var code = document.createElement("span");
-    code.className = "small muted";
-    code.textContent = p.url ? p.url : "";
-    foot.appendChild(code);
-    c.appendChild(foot);
-    return c;
-  }
-
-  /* ---------- 主流程 ---------- */
-  function render(){
-    var rows = sortRows(DATA.projects.filter(matches));
-    var host = el("cards");
-    host.textContent = "";
-    rows.forEach(function(p){ host.appendChild(card(p)); });
-    el("empty").hidden = rows.length !== 0;
-
-    el("cTotal").textContent = DATA.projects.length;
-    el("cLive").textContent = DATA.projects.filter(function(p){ return p.status === "已上線"; }).length;
-    el("cWip").textContent = DATA.projects.filter(function(p){ return p.status === "開發中"; }).length;
-
-    var parts = [];
-    if (state.cat.length)    parts.push("分類：" + state.cat.join("、"));
-    if (state.status.length) parts.push("狀態：" + state.status.join("、"));
-    if (state.q)             parts.push("搜尋：" + state.q);
-    el("filterStatus").textContent = parts.length
-      ? "目前條件：" + parts.join("｜") + "　→ 顯示 " + rows.length + " / " + DATA.projects.length + " 個專案"
-      : "顯示全部 " + DATA.projects.length + " 個專案";
-  }
-
-  /* ---------- 事件 ---------- */
-  var qTimer = null;
-  el("q").addEventListener("input", function(e){
-    var v = e.target.value;
-    window.clearTimeout(qTimer);
-    qTimer = window.setTimeout(function(){ state.q = v.trim(); render(); }, 120);
-  });
-  el("sort").addEventListener("change", function(e){ state.sort = e.target.value; render(); });
-  el("resetBtn").addEventListener("click", function(){
-    state.q = ""; state.cat = []; state.status = []; state.sort = "updated";
-    el("q").value = ""; el("sort").value = "updated";
-    Array.prototype.forEach.call(document.querySelectorAll("#f-cat input, #f-status input"), function(c, i){
-      c.checked = c.value === "__all__";
+      return t;
     });
     render();
-    live.textContent = "已重設全部條件";
-  });
-  el("printBtn").addEventListener("click", function(){ window.print(); });
+  }
+  function remove(id, li) {
+    var hit = tasks.filter(function (t) { return t.id === id; })[0];
+    if (li) {
+      li.classList.add("leaving");
+      window.setTimeout(function () { commit(); }, 160);
+    } else {
+      commit();
+    }
+    function commit() {
+      tasks = tasks.filter(function (t) { return t.id !== id; });
+      render();
+      if (hit) announce("已刪除：" + hit.text);
+      input.focus();
+    }
+  }
+  function clearDone() {
+    var n = tasks.filter(function (t) { return t.done; }).length;
+    tasks = tasks.filter(function (t) { return !t.done; });
+    render();
+    announce("已清除 " + n + " 項已完成");
+  }
 
-  var THEME_KEY = "nav.theme";
-  try { var sv = localStorage.getItem(THEME_KEY); if (sv === "light" || sv === "dark") document.documentElement.dataset.theme = sv; } catch(e){}
-  el("themeBtn").addEventListener("click", function(){
+  /* ---------- events ---------- */
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    add(text);
+    input.value = "";
+    input.focus();
+  });
+
+  clear.addEventListener("click", clearDone);
+
+  /* theme: follow the OS unless the user has chosen one */
+  var saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+  if (saved === "light" || saved === "dark") {
+    document.documentElement.dataset.theme = saved;
+  }
+  themeBtn.addEventListener("click", function () {
     var isDark = document.documentElement.dataset.theme
       ? document.documentElement.dataset.theme === "dark"
       : window.matchMedia("(prefers-color-scheme: dark)").matches;
     var next = isDark ? "light" : "dark";
     document.documentElement.dataset.theme = next;
-    try { localStorage.setItem(THEME_KEY, next); } catch(e){}
-    live.textContent = "已切換為" + (next === "dark" ? "深色" : "淺色") + "模式";
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    announce("已切換為" + (next === "dark" ? "深色" : "淺色") + "主題");
   });
 
-  load();
+  render();
+  input.focus();
 })();
 </script>
 </body>

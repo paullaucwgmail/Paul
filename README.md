@@ -4,12 +4,12 @@ A navigator page plus three self-contained web apps, published with GitHub Pages
 
 | Page | URL | What it is |
 |---|---|---|
-| **Navigator** | https://paullaucwgmail.github.io/Paul/ | Card index of every project, with search and category/status filters |
-| Todo list app | https://paullaucwgmail.github.io/Paul/todo/ | Interactive todo list (add / mark done / delete) |
+| Todo list app | https://paullaucwgmail.github.io/Paul/ | Interactive todo list (add / mark done / delete) |
+| **Navigator** | https://paullaucwgmail.github.io/Paul/nav/ | Card index of every project, with search and category/status filters |
 | Meeting deck | https://paullaucwgmail.github.io/Paul/deck/ | Traditional-Chinese presentation built from the one-hour meeting record |
 | Sales dashboard | https://paullaucwgmail.github.io/Paul/dashboard/ | Interactive Traditional-Chinese dashboard for `Dashboard_Data.xlsx` |
 
-> The navigator lives at the site root; the todo app moved from `/` to `/todo/`.
+> The todo app keeps the site root; the navigator lives at `/nav/` and reads `projects.json`.
 
 ## Adding a project
 
@@ -30,11 +30,13 @@ Edit **`projects.json`** only — the navigator renders from it at runtime. No p
 ```
 
 - `status` must be `已上線` or `開發中` (anything else is treated as `開發中`).
-- `url` is relative to the site root — put the app in its own folder and point at it.
+- `url` is relative to the navigator page (`/nav/`) — an app at the site root is `../`, a
+  subfolder app is `../app-name/`.
 - `categories` at the top level drives the filter chips; omit it and the categories are
   collected from the projects.
-- The navigator fetches `projects.json` over HTTP and falls back to a copy embedded in
-  `index.html` when opened as a local file (`file://`); the header states which source was used.
+- The navigator tries `projects.json`, then `../projects.json`, and finally falls back to a copy
+  embedded in `nav/index.html` when it is opened as a local file (`file://`); the header states
+  which source was used.
 
 ## Pages
 
@@ -65,6 +67,14 @@ design, risks, opportunities, timeline, next steps.
 - Dark/light mode, `prefers-reduced-motion`, ARIA labels and a live region
 - Every claim traces to the source document; nothing was invented
 
+### `nav/index.html` — Project navigator
+
+Card index of every project, rendered from `projects.json` at runtime: name, description,
+technology stack, status (`已上線` / `開發中`), category, update date, highlights and a link.
+Search covers name/description/stack/highlights; filters cover category and status; sorting
+covers update date, name and status. Includes a reset control, result counts, an empty state,
+dark/light theme, print styles and full keyboard/ARIA support.
+
 ### `dashboard/index.html` — Sales dashboard
 
 Interactive dashboard built strictly from `Dashboard_Data.xlsx` (sheet `SalesData`, 99 orders,
@@ -80,9 +90,9 @@ page. The hidden `PivotTable Answers` sheet and the workbook's legacy metadata w
 ## Project layout
 
 ```
-index.html                     navigator (fetches projects.json, has an embedded fallback)
+index.html                     todo app (self-contained)
+nav/index.html                 navigator (fetches projects.json, has an embedded fallback)
 projects.json                  the only file to edit when adding a project
-todo/index.html                todo app (self-contained)
 deck/index.html                meeting deck (self-contained)
 dashboard/index.html           sales dashboard (self-contained)
 .github/workflows/deploy.yml   build + deploy to GitHub Pages
