@@ -3,6 +3,7 @@
   "siteSubtitle": "所有已部署的網頁專案集中在此；新增專案只需編輯本檔（projects.json）。",
   "updated": "2026-10-24",
   "categories": [
+    "網站",
     "工具",
     "簡報",
     "數據分析"
@@ -12,6 +13,27 @@
     "開發中"
   ],
   "projects": [
+    {
+      "id": "johnny",
+      "name": "尊尼教育中心 官方網站",
+      "description": "Johnny Education Centre 尊尼教育中心主頁：公司簡介、教學理念、四款課程、師資介紹與聯絡方式。",
+      "stack": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "響應式設計",
+        "內嵌圖片"
+      ],
+      "status": "已上線",
+      "category": "網站",
+      "url": "../johnny/",
+      "updated": "2026-10-24",
+      "highlights": [
+        "單一自包含 HTML，圖片全部內嵌",
+        "手機漢堡選單與區塊高亮導覽",
+        "課程、師資、聯絡及營業時間完整呈現"
+      ]
+    },
     {
       "id": "todo",
       "name": "待辦清單 Todo List",

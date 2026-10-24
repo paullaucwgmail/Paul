@@ -5,6 +5,7 @@ A navigator page plus three self-contained web apps, published with GitHub Pages
 | Page | URL | What it is |
 |---|---|---|
 | Todo list app | https://paullaucwgmail.github.io/Paul/ | Interactive todo list (add / mark done / delete) |
+| Johnny Education Centre | https://paullaucwgmail.github.io/Paul/johnny/ | Centre homepage: about, teaching approach, courses, teachers, contact |
 | **Navigator** | https://paullaucwgmail.github.io/Paul/nav/ | Card index of every project, with search and category/status filters |
 | Meeting deck | https://paullaucwgmail.github.io/Paul/deck/ | Traditional-Chinese presentation built from the one-hour meeting record |
 | Sales dashboard | https://paullaucwgmail.github.io/Paul/dashboard/ | Interactive Traditional-Chinese dashboard for `Dashboard_Data.xlsx` |
@@ -75,6 +76,14 @@ Search covers name/description/stack/highlights; filters cover category and stat
 covers update date, name and status. Includes a reset control, result counts, an empty state,
 dark/light theme, print styles and full keyboard/ARIA support.
 
+### `johnny/index.html` — Johnny Education Centre homepage
+
+One self-contained page for the education centre, built only from the centre's own copy:
+about, teaching approach (four points), four courses with fees, teachers, contact details and
+opening hours. The logo and the four course banners are inlined (the banners are 16:9 crops of
+the supplied posters); the logo is embedded once as a CSS variable and reused. Responsive with a
+mobile menu and section highlighting; only the WhatsApp/tel/mailto links point outside the site.
+
 ### `dashboard/index.html` — Sales dashboard
 
 Interactive dashboard built strictly from `Dashboard_Data.xlsx` (sheet `SalesData`, 99 orders,
@@ -92,6 +101,7 @@ page. The hidden `PivotTable Answers` sheet and the workbook's legacy metadata w
 ```
 index.html                     todo app (self-contained)
 nav/index.html                 navigator (fetches projects.json, has an embedded fallback)
+johnny/index.html              Johnny Education Centre homepage (images inlined)
 projects.json                  the only file to edit when adding a project
 deck/index.html                meeting deck (self-contained)
 dashboard/index.html           sales dashboard (self-contained)
