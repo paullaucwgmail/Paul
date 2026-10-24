@@ -37,19 +37,25 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf dist
-          mkdir -p dist/deck dist/dashboard
+          mkdir -p dist/todo dist/deck dist/dashboard
           cp index.html dist/index.html
+          cp todo/index.html dist/todo/index.html
           cp deck/index.html dist/deck/index.html
           cp dashboard/index.html dist/dashboard/index.html
+          cp projects.json dist/projects.json
           # Fail the build early if any page is broken or empty.
-          for page in dist/index.html dist/deck/index.html dist/dashboard/index.html; do
+          for page in dist/index.html dist/todo/index.html dist/deck/index.html dist/dashboard/index.html; do
             test -s "$page"
             grep -qi "<html" "$page"
             grep -qi "</html>" "$page"
             echo "OK  $page — $(wc -c < "$page") bytes"
           done
+          # The navigator reads this file at runtime; it must be valid JSON.
+          python3 -c "import json,sys; d=json.load(open('dist/projects.json', encoding='utf-8')); \
+            assert isinstance(d.get('projects'), list) and d['projects'], 'projects.json has no projects'; \
+            print('OK  dist/projects.json —', len(d['projects']), 'projects')"
           # Refuse to ship a page that pulls in external resources.
-          if grep -Eqi '(src|href)="(https?:)?//' dist/index.html dist/deck/index.html dist/dashboard/index.html; then
+          if grep -Eqi '(src|href)="(https?:)?//' dist/index.html dist/todo/index.html dist/deck/index.html dist/dashboard/index.html; then
             echo "::error::An external resource reference was found; pages must be self-contained."
             exit 1
           fi

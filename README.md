@@ -1,12 +1,40 @@
 # Paul — static site
 
-Two self-contained pages, published with GitHub Pages.
+A navigator page plus three self-contained web apps, published with GitHub Pages.
 
 | Page | URL | What it is |
 |---|---|---|
-| Todo list app | https://paullaucwgmail.github.io/Paul/ | Interactive todo list (add / mark done / delete) |
+| **Navigator** | https://paullaucwgmail.github.io/Paul/ | Card index of every project, with search and category/status filters |
+| Todo list app | https://paullaucwgmail.github.io/Paul/todo/ | Interactive todo list (add / mark done / delete) |
 | Meeting deck | https://paullaucwgmail.github.io/Paul/deck/ | Traditional-Chinese presentation built from the one-hour meeting record |
 | Sales dashboard | https://paullaucwgmail.github.io/Paul/dashboard/ | Interactive Traditional-Chinese dashboard for `Dashboard_Data.xlsx` |
+
+> The navigator lives at the site root; the todo app moved from `/` to `/todo/`.
+
+## Adding a project
+
+Edit **`projects.json`** only — the navigator renders from it at runtime. No page code changes.
+
+```json
+{
+  "id": "new-project",
+  "name": "新專案名稱",
+  "description": "一句話簡介。",
+  "stack": ["HTML", "CSS", "JavaScript"],
+  "status": "開發中",
+  "category": "工具",
+  "url": "new-project/",
+  "updated": "2026-10-24",
+  "highlights": ["重點一", "重點二"]
+}
+```
+
+- `status` must be `已上線` or `開發中` (anything else is treated as `開發中`).
+- `url` is relative to the site root — put the app in its own folder and point at it.
+- `categories` at the top level drives the filter chips; omit it and the categories are
+  collected from the projects.
+- The navigator fetches `projects.json` over HTTP and falls back to a copy embedded in
+  `index.html` when opened as a local file (`file://`); the header states which source was used.
 
 ## Pages
 
@@ -52,7 +80,9 @@ page. The hidden `PivotTable Answers` sheet and the workbook's legacy metadata w
 ## Project layout
 
 ```
-index.html                     todo app (self-contained)
+index.html                     navigator (fetches projects.json, has an embedded fallback)
+projects.json                  the only file to edit when adding a project
+todo/index.html                todo app (self-contained)
 deck/index.html                meeting deck (self-contained)
 dashboard/index.html           sales dashboard (self-contained)
 .github/workflows/deploy.yml   build + deploy to GitHub Pages
