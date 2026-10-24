@@ -43,6 +43,15 @@ Every push to `main` runs the workflow in `.github/workflows/deploy.yml`:
 it validates `index.html`, copies it to `dist/`, uploads the Pages artifact and deploys it.
 Manual runs are available from the Actions tab (`workflow_dispatch`).
 
+**One-time setup:** GitHub does not allow a workflow to switch Pages on — the Actions
+`GITHUB_TOKEN` is blocked from creating a Pages site (`Resource not accessible by
+integration`). Enable it once by hand:
+
+1. Repository **Settings** → **Pages**
+2. **Build and deployment** → **Source: GitHub Actions**
+
+After that, every push to `main` deploys automatically.
+
 ## Verification
 
 The app's behaviour is covered by a jsdom smoke test (27 assertions): add / reject blank /
