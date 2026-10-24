@@ -24,6 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Configure Pages (enables Pages if it is not on yet)
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
       - name: Build
         run: |
           set -euo pipefail
